@@ -1,0 +1,17 @@
+{
+  "name": "Twisted Block",
+  "manufacturer": "Twisted Genetics",
+  "version": "0.1.0",
+  "format": "vst2",
+  "kind": "instrument",
+  "uid": "TwBk",
+  "numInputs": 0,
+  "numOutputs": 2,
+  "category": "Synth",
+  "file32": "VST/twisted-block-arm32.so",
+  "file64": "VST/twisted-block-arm64.so",
+  "description": "Twisted Block Phase 0: tracker grid proof of concept (no audio engine yet).",
+  "author": "Twisted Genetics",
+  "url": "https://github.com/TwistedGenetics/Twisted-Block",
+  "license": "MIT"
+}

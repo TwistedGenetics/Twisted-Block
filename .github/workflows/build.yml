@@ -1,0 +1,65 @@
+name: Build MPC plugin
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+env:
+  # Pinned MPC Plugin SDK (github.com/inmusic-software/mpc-plugin-builder-sdk)
+  SDK_REF: a5949cf6fe2cbfb95bcbe0ddf1f7ef555e71f2be
+  PLUGIN_NAME: Twisted Block
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Get the MPC Plugin SDK
+        run: |
+          git clone https://github.com/inmusic-software/mpc-plugin-builder-sdk sdk
+          git -C sdk checkout "$SDK_REF"
+          mkdir -p "sdk/plugins"
+          cp -r plugin "sdk/plugins/$PLUGIN_NAME"
+
+      - name: Install zig (cross compiler)
+        run: pip install ziglang
+
+      - name: Build native + arm32 + arm64 and validate
+        run: python sdk/tools/build.py "sdk/plugins/$PLUGIN_NAME" --zig "$(which python)"
+
+      - name: Host simulator test
+        run: |
+          SO="sdk/plugins/$PLUGIN_NAME/build/native/twisted-block.so"
+          sdk/.sdk-tools/host_sim "$SO" test --playing --notes 36
+
+      - name: Grid logic tests
+        run: |
+          SO="sdk/plugins/$PLUGIN_NAME/build/native/twisted-block.so"
+          c++ -std=c++17 -O2 -Isdk/framework -o test_grid tools/test_grid.cpp -ldl
+          for s in edit play stress; do ./test_grid "$SO" --scenario "$s" --dump "dump_$s.json"; done
+
+      - name: Screen mock-ups
+        run: |
+          pip install pillow
+          sudo apt-get install -y fonts-dejavu-core
+          mkdir -p previews
+          for s in edit play stress; do python tools/preview_skin.py "dump_$s.json" "previews/$s.png"; done
+
+      - name: Package
+        run: python sdk/tools/package.py "sdk/plugins/$PLUGIN_NAME" --out dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: twisted-block-mpc
+          path: dist/*.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: screen-previews
+          path: previews/*.png

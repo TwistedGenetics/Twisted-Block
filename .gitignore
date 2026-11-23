@@ -1,0 +1,9 @@
+build/
+dist/
+__pycache__/
+*.so
+*.dylib
+test_grid
+dump_*.json
+previews/
+sdk/
