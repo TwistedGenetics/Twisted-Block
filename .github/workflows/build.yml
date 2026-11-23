@@ -10,6 +10,9 @@ env:
   SDK_REF: a5949cf6fe2cbfb95bcbe0ddf1f7ef555e71f2be
   PLUGIN_NAME: Twisted Block
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -63,3 +66,14 @@ jobs:
         with:
           name: screen-previews
           path: previews/*.png
+
+      - name: Publish the latest build as a Release (main branch only)
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="latest-build"
+          NOTES="Latest build of main (${GITHUB_SHA::7}). Unzip and copy the 'Twisted Genetics - VST - Twisted Block' folder into 'VST2 Plugins' on your MPC drive."
+          gh release delete "$TAG" --yes --cleanup-tag || true
+          gh release create "$TAG" dist/*.zip previews/*.png --target "$GITHUB_SHA" --prerelease \
+            --title "Twisted Block - latest build" --notes "$NOTES"
