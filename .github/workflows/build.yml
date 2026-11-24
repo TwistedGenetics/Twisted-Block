@@ -39,7 +39,7 @@ jobs:
       - name: Host simulator test
         run: |
           SO="sdk/plugins/$PLUGIN_NAME/build/native/twisted-block.so"
-          sdk/.sdk-tools/host_sim "$SO" test --playing --notes 36
+          sdk/.sdk-tools/host_sim "$SO" test --notes 36,43
 
       - name: Grid logic tests
         run: |

@@ -72,7 +72,7 @@
          "showWhenDataModelInvalid": "Show",
          "whenVisible": "WhenFocussed",
          "boundsType": "Absolute",
-         "bounds": "0 0 214 86"
+         "bounds": "0 0 146 86"
         }
        },
        {
@@ -109,7 +109,7 @@
          "showWhenDataModelInvalid": "Show",
          "whenVisible": "Always",
          "boundsType": "Absolute",
-         "bounds": "12 4 194 28"
+         "bounds": "12 4 126 28"
         }
        },
        {
@@ -126,7 +126,7 @@
             "version": 1,
             "name": "Roboto",
             "style": "Bold",
-            "height": 40.0
+            "height": 34.0
            },
            "colour": "ff000000",
            "justification": "left verticallyCentred",
@@ -146,7 +146,7 @@
          "showWhenDataModelInvalid": "Show",
          "whenVisible": "Always",
          "boundsType": "Absolute",
-         "bounds": "12 32 194 50"
+         "bounds": "12 32 126 50"
         }
        }
       ]
@@ -219,7 +219,7 @@
          "showWhenDataModelInvalid": "Show",
          "whenVisible": "WhenFocussed",
          "boundsType": "Absolute",
-         "bounds": "0 0 214 86"
+         "bounds": "0 0 146 86"
         }
        },
        {
@@ -256,7 +256,7 @@
          "showWhenDataModelInvalid": "Show",
          "whenVisible": "Always",
          "boundsType": "Absolute",
-         "bounds": "12 4 194 28"
+         "bounds": "12 4 126 28"
         }
        },
        {
@@ -273,7 +273,7 @@
             "version": 1,
             "name": "Roboto",
             "style": "Bold",
-            "height": 40.0
+            "height": 34.0
            },
            "colour": "ff000000",
            "justification": "left verticallyCentred",
@@ -293,7 +293,7 @@
          "showWhenDataModelInvalid": "Show",
          "whenVisible": "Always",
          "boundsType": "Absolute",
-         "bounds": "12 32 194 50"
+         "bounds": "12 32 126 50"
         }
        }
       ]
@@ -459,8 +459,17 @@
    {
     "key": "Parameter 9",
     "value": [
-     "Poll",
-     "Notify"
+     "Notify",
+     "Rebuild",
+     "Both",
+     "Poll"
+    ]
+   },
+   {
+    "key": "Parameter 12",
+    "value": [
+     "Play",
+     "Edit"
     ]
    }
   ],
@@ -873,7 +882,7 @@
          "offImage": "img/clear_540x36.png",
          "indicatorId": 0,
          "numIndicatorsInGroup": 17,
-         "handleName": "Parameter 108"
+         "handleName": "Parameter 112"
         }
        },
        "handle remapping": {
@@ -901,7 +910,7 @@
          "offImage": "img/clear_540x36.png",
          "indicatorId": 1,
          "numIndicatorsInGroup": 17,
-         "handleName": "Parameter 108"
+         "handleName": "Parameter 112"
         }
        },
        "handle remapping": {
@@ -929,7 +938,7 @@
          "offImage": "img/clear_540x36.png",
          "indicatorId": 2,
          "numIndicatorsInGroup": 17,
-         "handleName": "Parameter 108"
+         "handleName": "Parameter 112"
         }
        },
        "handle remapping": {
@@ -957,7 +966,7 @@
          "offImage": "img/clear_540x36.png",
          "indicatorId": 3,
          "numIndicatorsInGroup": 17,
-         "handleName": "Parameter 108"
+         "handleName": "Parameter 112"
         }
        },
        "handle remapping": {
@@ -985,7 +994,7 @@
          "offImage": "img/clear_540x36.png",
          "indicatorId": 4,
          "numIndicatorsInGroup": 17,
-         "handleName": "Parameter 108"
+         "handleName": "Parameter 112"
         }
        },
        "handle remapping": {
@@ -1013,7 +1022,7 @@
          "offImage": "img/clear_540x36.png",
          "indicatorId": 5,
          "numIndicatorsInGroup": 17,
-         "handleName": "Parameter 108"
+         "handleName": "Parameter 112"
         }
        },
        "handle remapping": {
@@ -1041,7 +1050,7 @@
          "offImage": "img/clear_540x36.png",
          "indicatorId": 6,
          "numIndicatorsInGroup": 17,
-         "handleName": "Parameter 108"
+         "handleName": "Parameter 112"
         }
        },
        "handle remapping": {
@@ -1069,7 +1078,7 @@
          "offImage": "img/clear_540x36.png",
          "indicatorId": 7,
          "numIndicatorsInGroup": 17,
-         "handleName": "Parameter 108"
+         "handleName": "Parameter 112"
         }
        },
        "handle remapping": {
@@ -1097,7 +1106,7 @@
          "offImage": "img/clear_540x36.png",
          "indicatorId": 8,
          "numIndicatorsInGroup": 17,
-         "handleName": "Parameter 108"
+         "handleName": "Parameter 112"
         }
        },
        "handle remapping": {
@@ -1125,7 +1134,7 @@
          "offImage": "img/clear_540x36.png",
          "indicatorId": 9,
          "numIndicatorsInGroup": 17,
-         "handleName": "Parameter 108"
+         "handleName": "Parameter 112"
         }
        },
        "handle remapping": {
@@ -1153,7 +1162,7 @@
          "offImage": "img/clear_540x36.png",
          "indicatorId": 10,
          "numIndicatorsInGroup": 17,
-         "handleName": "Parameter 108"
+         "handleName": "Parameter 112"
         }
        },
        "handle remapping": {
@@ -1181,7 +1190,7 @@
          "offImage": "img/clear_540x36.png",
          "indicatorId": 11,
          "numIndicatorsInGroup": 17,
-         "handleName": "Parameter 108"
+         "handleName": "Parameter 112"
         }
        },
        "handle remapping": {
@@ -1209,7 +1218,7 @@
          "offImage": "img/clear_540x36.png",
          "indicatorId": 12,
          "numIndicatorsInGroup": 17,
-         "handleName": "Parameter 108"
+         "handleName": "Parameter 112"
         }
        },
        "handle remapping": {
@@ -1237,7 +1246,7 @@
          "offImage": "img/clear_540x36.png",
          "indicatorId": 13,
          "numIndicatorsInGroup": 17,
-         "handleName": "Parameter 108"
+         "handleName": "Parameter 112"
         }
        },
        "handle remapping": {
@@ -1265,7 +1274,7 @@
          "offImage": "img/clear_540x36.png",
          "indicatorId": 14,
          "numIndicatorsInGroup": 17,
-         "handleName": "Parameter 108"
+         "handleName": "Parameter 112"
         }
        },
        "handle remapping": {
@@ -1293,7 +1302,7 @@
          "offImage": "img/clear_540x36.png",
          "indicatorId": 15,
          "numIndicatorsInGroup": 17,
-         "handleName": "Parameter 108"
+         "handleName": "Parameter 112"
         }
        },
        "handle remapping": {
@@ -1347,7 +1356,7 @@
          "colour": "0",
          "image": "img/strip_line.png",
          "numFrames": 129,
-         "handleName": "Parameter 12"
+         "handleName": "Parameter 16"
         }
        },
        "handle remapping": {
@@ -1375,7 +1384,7 @@
          "colour": "0",
          "image": "img/strip_note.png",
          "numFrames": 123,
-         "handleName": "Parameter 13"
+         "handleName": "Parameter 17"
         }
        },
        "handle remapping": {
@@ -1403,7 +1412,7 @@
          "colour": "0",
          "image": "img/strip_inst.png",
          "numFrames": 257,
-         "handleName": "Parameter 14"
+         "handleName": "Parameter 18"
         }
        },
        "handle remapping": {
@@ -1431,7 +1440,7 @@
          "colour": "0",
          "image": "img/strip_vol.png",
          "numFrames": 67,
-         "handleName": "Parameter 15"
+         "handleName": "Parameter 19"
         }
        },
        "handle remapping": {
@@ -1459,7 +1468,7 @@
          "colour": "0",
          "image": "img/strip_cmd.png",
          "numFrames": 38,
-         "handleName": "Parameter 16"
+         "handleName": "Parameter 20"
         }
        },
        "handle remapping": {
@@ -1487,7 +1496,7 @@
          "colour": "0",
          "image": "img/strip_val.png",
          "numFrames": 258,
-         "handleName": "Parameter 17"
+         "handleName": "Parameter 21"
         }
        },
        "handle remapping": {
@@ -1515,7 +1524,7 @@
          "colour": "0",
          "image": "img/strip_line.png",
          "numFrames": 129,
-         "handleName": "Parameter 18"
+         "handleName": "Parameter 22"
         }
        },
        "handle remapping": {
@@ -1543,7 +1552,7 @@
          "colour": "0",
          "image": "img/strip_note.png",
          "numFrames": 123,
-         "handleName": "Parameter 19"
+         "handleName": "Parameter 23"
         }
        },
        "handle remapping": {
@@ -1571,7 +1580,7 @@
          "colour": "0",
          "image": "img/strip_inst.png",
          "numFrames": 257,
-         "handleName": "Parameter 20"
+         "handleName": "Parameter 24"
         }
        },
        "handle remapping": {
@@ -1599,7 +1608,7 @@
          "colour": "0",
          "image": "img/strip_vol.png",
          "numFrames": 67,
-         "handleName": "Parameter 21"
+         "handleName": "Parameter 25"
         }
        },
        "handle remapping": {
@@ -1627,7 +1636,7 @@
          "colour": "0",
          "image": "img/strip_cmd.png",
          "numFrames": 38,
-         "handleName": "Parameter 22"
+         "handleName": "Parameter 26"
         }
        },
        "handle remapping": {
@@ -1655,7 +1664,7 @@
          "colour": "0",
          "image": "img/strip_val.png",
          "numFrames": 258,
-         "handleName": "Parameter 23"
+         "handleName": "Parameter 27"
         }
        },
        "handle remapping": {
@@ -1683,7 +1692,7 @@
          "colour": "0",
          "image": "img/strip_line.png",
          "numFrames": 129,
-         "handleName": "Parameter 24"
+         "handleName": "Parameter 28"
         }
        },
        "handle remapping": {
@@ -1711,7 +1720,7 @@
          "colour": "0",
          "image": "img/strip_note.png",
          "numFrames": 123,
-         "handleName": "Parameter 25"
+         "handleName": "Parameter 29"
         }
        },
        "handle remapping": {
@@ -1739,7 +1748,7 @@
          "colour": "0",
          "image": "img/strip_inst.png",
          "numFrames": 257,
-         "handleName": "Parameter 26"
+         "handleName": "Parameter 30"
         }
        },
        "handle remapping": {
@@ -1767,7 +1776,7 @@
          "colour": "0",
          "image": "img/strip_vol.png",
          "numFrames": 67,
-         "handleName": "Parameter 27"
+         "handleName": "Parameter 31"
         }
        },
        "handle remapping": {
@@ -1795,7 +1804,7 @@
          "colour": "0",
          "image": "img/strip_cmd.png",
          "numFrames": 38,
-         "handleName": "Parameter 28"
+         "handleName": "Parameter 32"
         }
        },
        "handle remapping": {
@@ -1823,7 +1832,7 @@
          "colour": "0",
          "image": "img/strip_val.png",
          "numFrames": 258,
-         "handleName": "Parameter 29"
+         "handleName": "Parameter 33"
         }
        },
        "handle remapping": {
@@ -1851,7 +1860,7 @@
          "colour": "0",
          "image": "img/strip_line.png",
          "numFrames": 129,
-         "handleName": "Parameter 30"
+         "handleName": "Parameter 34"
         }
        },
        "handle remapping": {
@@ -1879,7 +1888,7 @@
          "colour": "0",
          "image": "img/strip_note.png",
          "numFrames": 123,
-         "handleName": "Parameter 31"
+         "handleName": "Parameter 35"
         }
        },
        "handle remapping": {
@@ -1907,7 +1916,7 @@
          "colour": "0",
          "image": "img/strip_inst.png",
          "numFrames": 257,
-         "handleName": "Parameter 32"
+         "handleName": "Parameter 36"
         }
        },
        "handle remapping": {
@@ -1935,7 +1944,7 @@
          "colour": "0",
          "image": "img/strip_vol.png",
          "numFrames": 67,
-         "handleName": "Parameter 33"
+         "handleName": "Parameter 37"
         }
        },
        "handle remapping": {
@@ -1963,7 +1972,7 @@
          "colour": "0",
          "image": "img/strip_cmd.png",
          "numFrames": 38,
-         "handleName": "Parameter 34"
+         "handleName": "Parameter 38"
         }
        },
        "handle remapping": {
@@ -1991,7 +2000,7 @@
          "colour": "0",
          "image": "img/strip_val.png",
          "numFrames": 258,
-         "handleName": "Parameter 35"
+         "handleName": "Parameter 39"
         }
        },
        "handle remapping": {
@@ -2019,7 +2028,7 @@
          "colour": "0",
          "image": "img/strip_line.png",
          "numFrames": 129,
-         "handleName": "Parameter 36"
+         "handleName": "Parameter 40"
         }
        },
        "handle remapping": {
@@ -2047,7 +2056,7 @@
          "colour": "0",
          "image": "img/strip_note.png",
          "numFrames": 123,
-         "handleName": "Parameter 37"
+         "handleName": "Parameter 41"
         }
        },
        "handle remapping": {
@@ -2075,7 +2084,7 @@
          "colour": "0",
          "image": "img/strip_inst.png",
          "numFrames": 257,
-         "handleName": "Parameter 38"
+         "handleName": "Parameter 42"
         }
        },
        "handle remapping": {
@@ -2103,7 +2112,7 @@
          "colour": "0",
          "image": "img/strip_vol.png",
          "numFrames": 67,
-         "handleName": "Parameter 39"
+         "handleName": "Parameter 43"
         }
        },
        "handle remapping": {
@@ -2131,7 +2140,7 @@
          "colour": "0",
          "image": "img/strip_cmd.png",
          "numFrames": 38,
-         "handleName": "Parameter 40"
+         "handleName": "Parameter 44"
         }
        },
        "handle remapping": {
@@ -2159,7 +2168,7 @@
          "colour": "0",
          "image": "img/strip_val.png",
          "numFrames": 258,
-         "handleName": "Parameter 41"
+         "handleName": "Parameter 45"
         }
        },
        "handle remapping": {
@@ -2187,7 +2196,7 @@
          "colour": "0",
          "image": "img/strip_line.png",
          "numFrames": 129,
-         "handleName": "Parameter 42"
+         "handleName": "Parameter 46"
         }
        },
        "handle remapping": {
@@ -2215,7 +2224,7 @@
          "colour": "0",
          "image": "img/strip_note.png",
          "numFrames": 123,
-         "handleName": "Parameter 43"
+         "handleName": "Parameter 47"
         }
        },
        "handle remapping": {
@@ -2243,7 +2252,7 @@
          "colour": "0",
          "image": "img/strip_inst.png",
          "numFrames": 257,
-         "handleName": "Parameter 44"
+         "handleName": "Parameter 48"
         }
        },
        "handle remapping": {
@@ -2271,7 +2280,7 @@
          "colour": "0",
          "image": "img/strip_vol.png",
          "numFrames": 67,
-         "handleName": "Parameter 45"
+         "handleName": "Parameter 49"
         }
        },
        "handle remapping": {
@@ -2299,7 +2308,7 @@
          "colour": "0",
          "image": "img/strip_cmd.png",
          "numFrames": 38,
-         "handleName": "Parameter 46"
+         "handleName": "Parameter 50"
         }
        },
        "handle remapping": {
@@ -2327,7 +2336,7 @@
          "colour": "0",
          "image": "img/strip_val.png",
          "numFrames": 258,
-         "handleName": "Parameter 47"
+         "handleName": "Parameter 51"
         }
        },
        "handle remapping": {
@@ -2355,7 +2364,7 @@
          "colour": "0",
          "image": "img/strip_line.png",
          "numFrames": 129,
-         "handleName": "Parameter 48"
+         "handleName": "Parameter 52"
         }
        },
        "handle remapping": {
@@ -2383,7 +2392,7 @@
          "colour": "0",
          "image": "img/strip_note.png",
          "numFrames": 123,
-         "handleName": "Parameter 49"
+         "handleName": "Parameter 53"
         }
        },
        "handle remapping": {
@@ -2411,7 +2420,7 @@
          "colour": "0",
          "image": "img/strip_inst.png",
          "numFrames": 257,
-         "handleName": "Parameter 50"
+         "handleName": "Parameter 54"
         }
        },
        "handle remapping": {
@@ -2439,7 +2448,7 @@
          "colour": "0",
          "image": "img/strip_vol.png",
          "numFrames": 67,
-         "handleName": "Parameter 51"
+         "handleName": "Parameter 55"
         }
        },
        "handle remapping": {
@@ -2467,7 +2476,7 @@
          "colour": "0",
          "image": "img/strip_cmd.png",
          "numFrames": 38,
-         "handleName": "Parameter 52"
+         "handleName": "Parameter 56"
         }
        },
        "handle remapping": {
@@ -2495,7 +2504,7 @@
          "colour": "0",
          "image": "img/strip_val.png",
          "numFrames": 258,
-         "handleName": "Parameter 53"
+         "handleName": "Parameter 57"
         }
        },
        "handle remapping": {
@@ -2523,7 +2532,7 @@
          "colour": "0",
          "image": "img/strip_line.png",
          "numFrames": 129,
-         "handleName": "Parameter 54"
+         "handleName": "Parameter 58"
         }
        },
        "handle remapping": {
@@ -2551,7 +2560,7 @@
          "colour": "0",
          "image": "img/strip_note.png",
          "numFrames": 123,
-         "handleName": "Parameter 55"
+         "handleName": "Parameter 59"
         }
        },
        "handle remapping": {
@@ -2579,7 +2588,7 @@
          "colour": "0",
          "image": "img/strip_inst.png",
          "numFrames": 257,
-         "handleName": "Parameter 56"
+         "handleName": "Parameter 60"
         }
        },
        "handle remapping": {
@@ -2607,7 +2616,7 @@
          "colour": "0",
          "image": "img/strip_vol.png",
          "numFrames": 67,
-         "handleName": "Parameter 57"
+         "handleName": "Parameter 61"
         }
        },
        "handle remapping": {
@@ -2635,7 +2644,7 @@
          "colour": "0",
          "image": "img/strip_cmd.png",
          "numFrames": 38,
-         "handleName": "Parameter 58"
+         "handleName": "Parameter 62"
         }
        },
        "handle remapping": {
@@ -2663,7 +2672,7 @@
          "colour": "0",
          "image": "img/strip_val.png",
          "numFrames": 258,
-         "handleName": "Parameter 59"
+         "handleName": "Parameter 63"
         }
        },
        "handle remapping": {
@@ -2691,7 +2700,7 @@
          "colour": "0",
          "image": "img/strip_line.png",
          "numFrames": 129,
-         "handleName": "Parameter 60"
+         "handleName": "Parameter 64"
         }
        },
        "handle remapping": {
@@ -2719,7 +2728,7 @@
          "colour": "0",
          "image": "img/strip_note.png",
          "numFrames": 123,
-         "handleName": "Parameter 61"
+         "handleName": "Parameter 65"
         }
        },
        "handle remapping": {
@@ -2747,7 +2756,7 @@
          "colour": "0",
          "image": "img/strip_inst.png",
          "numFrames": 257,
-         "handleName": "Parameter 62"
+         "handleName": "Parameter 66"
         }
        },
        "handle remapping": {
@@ -2775,7 +2784,7 @@
          "colour": "0",
          "image": "img/strip_vol.png",
          "numFrames": 67,
-         "handleName": "Parameter 63"
+         "handleName": "Parameter 67"
         }
        },
        "handle remapping": {
@@ -2803,7 +2812,7 @@
          "colour": "0",
          "image": "img/strip_cmd.png",
          "numFrames": 38,
-         "handleName": "Parameter 64"
+         "handleName": "Parameter 68"
         }
        },
        "handle remapping": {
@@ -2831,7 +2840,7 @@
          "colour": "0",
          "image": "img/strip_val.png",
          "numFrames": 258,
-         "handleName": "Parameter 65"
+         "handleName": "Parameter 69"
         }
        },
        "handle remapping": {
@@ -2859,7 +2868,7 @@
          "colour": "0",
          "image": "img/strip_line.png",
          "numFrames": 129,
-         "handleName": "Parameter 66"
+         "handleName": "Parameter 70"
         }
        },
        "handle remapping": {
@@ -2887,7 +2896,7 @@
          "colour": "0",
          "image": "img/strip_note.png",
          "numFrames": 123,
-         "handleName": "Parameter 67"
+         "handleName": "Parameter 71"
         }
        },
        "handle remapping": {
@@ -2915,7 +2924,7 @@
          "colour": "0",
          "image": "img/strip_inst.png",
          "numFrames": 257,
-         "handleName": "Parameter 68"
+         "handleName": "Parameter 72"
         }
        },
        "handle remapping": {
@@ -2943,7 +2952,7 @@
          "colour": "0",
          "image": "img/strip_vol.png",
          "numFrames": 67,
-         "handleName": "Parameter 69"
+         "handleName": "Parameter 73"
         }
        },
        "handle remapping": {
@@ -2971,7 +2980,7 @@
          "colour": "0",
          "image": "img/strip_cmd.png",
          "numFrames": 38,
-         "handleName": "Parameter 70"
+         "handleName": "Parameter 74"
         }
        },
        "handle remapping": {
@@ -2999,7 +3008,7 @@
          "colour": "0",
          "image": "img/strip_val.png",
          "numFrames": 258,
-         "handleName": "Parameter 71"
+         "handleName": "Parameter 75"
         }
        },
        "handle remapping": {
@@ -3027,7 +3036,7 @@
          "colour": "0",
          "image": "img/strip_line.png",
          "numFrames": 129,
-         "handleName": "Parameter 72"
+         "handleName": "Parameter 76"
         }
        },
        "handle remapping": {
@@ -3055,7 +3064,7 @@
          "colour": "0",
          "image": "img/strip_note.png",
          "numFrames": 123,
-         "handleName": "Parameter 73"
+         "handleName": "Parameter 77"
         }
        },
        "handle remapping": {
@@ -3083,7 +3092,7 @@
          "colour": "0",
          "image": "img/strip_inst.png",
          "numFrames": 257,
-         "handleName": "Parameter 74"
+         "handleName": "Parameter 78"
         }
        },
        "handle remapping": {
@@ -3111,7 +3120,7 @@
          "colour": "0",
          "image": "img/strip_vol.png",
          "numFrames": 67,
-         "handleName": "Parameter 75"
+         "handleName": "Parameter 79"
         }
        },
        "handle remapping": {
@@ -3139,7 +3148,7 @@
          "colour": "0",
          "image": "img/strip_cmd.png",
          "numFrames": 38,
-         "handleName": "Parameter 76"
+         "handleName": "Parameter 80"
         }
        },
        "handle remapping": {
@@ -3167,7 +3176,7 @@
          "colour": "0",
          "image": "img/strip_val.png",
          "numFrames": 258,
-         "handleName": "Parameter 77"
+         "handleName": "Parameter 81"
         }
        },
        "handle remapping": {
@@ -3195,7 +3204,7 @@
          "colour": "0",
          "image": "img/strip_line.png",
          "numFrames": 129,
-         "handleName": "Parameter 78"
+         "handleName": "Parameter 82"
         }
        },
        "handle remapping": {
@@ -3223,7 +3232,7 @@
          "colour": "0",
          "image": "img/strip_note.png",
          "numFrames": 123,
-         "handleName": "Parameter 79"
+         "handleName": "Parameter 83"
         }
        },
        "handle remapping": {
@@ -3251,7 +3260,7 @@
          "colour": "0",
          "image": "img/strip_inst.png",
          "numFrames": 257,
-         "handleName": "Parameter 80"
+         "handleName": "Parameter 84"
         }
        },
        "handle remapping": {
@@ -3279,7 +3288,7 @@
          "colour": "0",
          "image": "img/strip_vol.png",
          "numFrames": 67,
-         "handleName": "Parameter 81"
+         "handleName": "Parameter 85"
         }
        },
        "handle remapping": {
@@ -3307,7 +3316,7 @@
          "colour": "0",
          "image": "img/strip_cmd.png",
          "numFrames": 38,
-         "handleName": "Parameter 82"
+         "handleName": "Parameter 86"
         }
        },
        "handle remapping": {
@@ -3335,7 +3344,7 @@
          "colour": "0",
          "image": "img/strip_val.png",
          "numFrames": 258,
-         "handleName": "Parameter 83"
+         "handleName": "Parameter 87"
         }
        },
        "handle remapping": {
@@ -3363,7 +3372,7 @@
          "colour": "0",
          "image": "img/strip_line.png",
          "numFrames": 129,
-         "handleName": "Parameter 84"
+         "handleName": "Parameter 88"
         }
        },
        "handle remapping": {
@@ -3391,7 +3400,7 @@
          "colour": "0",
          "image": "img/strip_note.png",
          "numFrames": 123,
-         "handleName": "Parameter 85"
+         "handleName": "Parameter 89"
         }
        },
        "handle remapping": {
@@ -3419,7 +3428,7 @@
          "colour": "0",
          "image": "img/strip_inst.png",
          "numFrames": 257,
-         "handleName": "Parameter 86"
+         "handleName": "Parameter 90"
         }
        },
        "handle remapping": {
@@ -3447,7 +3456,7 @@
          "colour": "0",
          "image": "img/strip_vol.png",
          "numFrames": 67,
-         "handleName": "Parameter 87"
+         "handleName": "Parameter 91"
         }
        },
        "handle remapping": {
@@ -3475,7 +3484,7 @@
          "colour": "0",
          "image": "img/strip_cmd.png",
          "numFrames": 38,
-         "handleName": "Parameter 88"
+         "handleName": "Parameter 92"
         }
        },
        "handle remapping": {
@@ -3503,7 +3512,7 @@
          "colour": "0",
          "image": "img/strip_val.png",
          "numFrames": 258,
-         "handleName": "Parameter 89"
+         "handleName": "Parameter 93"
         }
        },
        "handle remapping": {
@@ -3531,7 +3540,7 @@
          "colour": "0",
          "image": "img/strip_line.png",
          "numFrames": 129,
-         "handleName": "Parameter 90"
+         "handleName": "Parameter 94"
         }
        },
        "handle remapping": {
@@ -3559,7 +3568,7 @@
          "colour": "0",
          "image": "img/strip_note.png",
          "numFrames": 123,
-         "handleName": "Parameter 91"
+         "handleName": "Parameter 95"
         }
        },
        "handle remapping": {
@@ -3587,7 +3596,7 @@
          "colour": "0",
          "image": "img/strip_inst.png",
          "numFrames": 257,
-         "handleName": "Parameter 92"
+         "handleName": "Parameter 96"
         }
        },
        "handle remapping": {
@@ -3615,7 +3624,7 @@
          "colour": "0",
          "image": "img/strip_vol.png",
          "numFrames": 67,
-         "handleName": "Parameter 93"
+         "handleName": "Parameter 97"
         }
        },
        "handle remapping": {
@@ -3643,7 +3652,7 @@
          "colour": "0",
          "image": "img/strip_cmd.png",
          "numFrames": 38,
-         "handleName": "Parameter 94"
+         "handleName": "Parameter 98"
         }
        },
        "handle remapping": {
@@ -3671,7 +3680,7 @@
          "colour": "0",
          "image": "img/strip_val.png",
          "numFrames": 258,
-         "handleName": "Parameter 95"
+         "handleName": "Parameter 99"
         }
        },
        "handle remapping": {
@@ -3699,7 +3708,7 @@
          "colour": "0",
          "image": "img/strip_line.png",
          "numFrames": 129,
-         "handleName": "Parameter 96"
+         "handleName": "Parameter 100"
         }
        },
        "handle remapping": {
@@ -3727,7 +3736,7 @@
          "colour": "0",
          "image": "img/strip_note.png",
          "numFrames": 123,
-         "handleName": "Parameter 97"
+         "handleName": "Parameter 101"
         }
        },
        "handle remapping": {
@@ -3755,7 +3764,7 @@
          "colour": "0",
          "image": "img/strip_inst.png",
          "numFrames": 257,
-         "handleName": "Parameter 98"
+         "handleName": "Parameter 102"
         }
        },
        "handle remapping": {
@@ -3783,7 +3792,7 @@
          "colour": "0",
          "image": "img/strip_vol.png",
          "numFrames": 67,
-         "handleName": "Parameter 99"
+         "handleName": "Parameter 103"
         }
        },
        "handle remapping": {
@@ -3811,7 +3820,7 @@
          "colour": "0",
          "image": "img/strip_cmd.png",
          "numFrames": 38,
-         "handleName": "Parameter 100"
+         "handleName": "Parameter 104"
         }
        },
        "handle remapping": {
@@ -3839,7 +3848,7 @@
          "colour": "0",
          "image": "img/strip_val.png",
          "numFrames": 258,
-         "handleName": "Parameter 101"
+         "handleName": "Parameter 105"
         }
        },
        "handle remapping": {
@@ -3867,7 +3876,7 @@
          "colour": "0",
          "image": "img/strip_line.png",
          "numFrames": 129,
-         "handleName": "Parameter 102"
+         "handleName": "Parameter 106"
         }
        },
        "handle remapping": {
@@ -3895,7 +3904,7 @@
          "colour": "0",
          "image": "img/strip_note.png",
          "numFrames": 123,
-         "handleName": "Parameter 103"
+         "handleName": "Parameter 107"
         }
        },
        "handle remapping": {
@@ -3923,7 +3932,7 @@
          "colour": "0",
          "image": "img/strip_inst.png",
          "numFrames": 257,
-         "handleName": "Parameter 104"
+         "handleName": "Parameter 108"
         }
        },
        "handle remapping": {
@@ -3951,7 +3960,7 @@
          "colour": "0",
          "image": "img/strip_vol.png",
          "numFrames": 67,
-         "handleName": "Parameter 105"
+         "handleName": "Parameter 109"
         }
        },
        "handle remapping": {
@@ -3979,7 +3988,7 @@
          "colour": "0",
          "image": "img/strip_cmd.png",
          "numFrames": 38,
-         "handleName": "Parameter 106"
+         "handleName": "Parameter 110"
         }
        },
        "handle remapping": {
@@ -4007,7 +4016,7 @@
          "colour": "0",
          "image": "img/strip_val.png",
          "numFrames": 258,
-         "handleName": "Parameter 107"
+         "handleName": "Parameter 111"
         }
        },
        "handle remapping": {
@@ -4035,7 +4044,7 @@
          "offImage": "img/clear_540x36.png",
          "indicatorId": 0,
          "numIndicatorsInGroup": 17,
-         "handleName": "Parameter 109"
+         "handleName": "Parameter 113"
         }
        },
        "handle remapping": {
@@ -4063,7 +4072,7 @@
          "offImage": "img/clear_540x36.png",
          "indicatorId": 1,
          "numIndicatorsInGroup": 17,
-         "handleName": "Parameter 109"
+         "handleName": "Parameter 113"
         }
        },
        "handle remapping": {
@@ -4091,7 +4100,7 @@
          "offImage": "img/clear_540x36.png",
          "indicatorId": 2,
          "numIndicatorsInGroup": 17,
-         "handleName": "Parameter 109"
+         "handleName": "Parameter 113"
         }
        },
        "handle remapping": {
@@ -4119,7 +4128,7 @@
          "offImage": "img/clear_540x36.png",
          "indicatorId": 3,
          "numIndicatorsInGroup": 17,
-         "handleName": "Parameter 109"
+         "handleName": "Parameter 113"
         }
        },
        "handle remapping": {
@@ -4147,7 +4156,7 @@
          "offImage": "img/clear_540x36.png",
          "indicatorId": 4,
          "numIndicatorsInGroup": 17,
-         "handleName": "Parameter 109"
+         "handleName": "Parameter 113"
         }
        },
        "handle remapping": {
@@ -4175,7 +4184,7 @@
          "offImage": "img/clear_540x36.png",
          "indicatorId": 5,
          "numIndicatorsInGroup": 17,
-         "handleName": "Parameter 109"
+         "handleName": "Parameter 113"
         }
        },
        "handle remapping": {
@@ -4203,7 +4212,7 @@
          "offImage": "img/clear_540x36.png",
          "indicatorId": 6,
          "numIndicatorsInGroup": 17,
-         "handleName": "Parameter 109"
+         "handleName": "Parameter 113"
         }
        },
        "handle remapping": {
@@ -4231,7 +4240,7 @@
          "offImage": "img/clear_540x36.png",
          "indicatorId": 7,
          "numIndicatorsInGroup": 17,
-         "handleName": "Parameter 109"
+         "handleName": "Parameter 113"
         }
        },
        "handle remapping": {
@@ -4259,7 +4268,7 @@
          "offImage": "img/clear_540x36.png",
          "indicatorId": 8,
          "numIndicatorsInGroup": 17,
-         "handleName": "Parameter 109"
+         "handleName": "Parameter 113"
         }
        },
        "handle remapping": {
@@ -4287,7 +4296,7 @@
          "offImage": "img/clear_540x36.png",
          "indicatorId": 9,
          "numIndicatorsInGroup": 17,
-         "handleName": "Parameter 109"
+         "handleName": "Parameter 113"
         }
        },
        "handle remapping": {
@@ -4315,7 +4324,7 @@
          "offImage": "img/clear_540x36.png",
          "indicatorId": 10,
          "numIndicatorsInGroup": 17,
-         "handleName": "Parameter 109"
+         "handleName": "Parameter 113"
         }
        },
        "handle remapping": {
@@ -4343,7 +4352,7 @@
          "offImage": "img/clear_540x36.png",
          "indicatorId": 11,
          "numIndicatorsInGroup": 17,
-         "handleName": "Parameter 109"
+         "handleName": "Parameter 113"
         }
        },
        "handle remapping": {
@@ -4371,7 +4380,7 @@
          "offImage": "img/clear_540x36.png",
          "indicatorId": 12,
          "numIndicatorsInGroup": 17,
-         "handleName": "Parameter 109"
+         "handleName": "Parameter 113"
         }
        },
        "handle remapping": {
@@ -4399,7 +4408,7 @@
          "offImage": "img/clear_540x36.png",
          "indicatorId": 13,
          "numIndicatorsInGroup": 17,
-         "handleName": "Parameter 109"
+         "handleName": "Parameter 113"
         }
        },
        "handle remapping": {
@@ -4427,7 +4436,7 @@
          "offImage": "img/clear_540x36.png",
          "indicatorId": 14,
          "numIndicatorsInGroup": 17,
-         "handleName": "Parameter 109"
+         "handleName": "Parameter 113"
         }
        },
        "handle remapping": {
@@ -4455,7 +4464,7 @@
          "offImage": "img/clear_540x36.png",
          "indicatorId": 15,
          "numIndicatorsInGroup": 17,
-         "handleName": "Parameter 109"
+         "handleName": "Parameter 113"
         }
        },
        "handle remapping": {
@@ -6832,7 +6841,7 @@
          "offImage": "img/act_off.png",
          "indicatorId": 1,
          "numIndicatorsInGroup": 2,
-         "handleName": "Parameter 110"
+         "handleName": "Parameter 114"
         }
        },
        "handle remapping": {
@@ -6889,7 +6898,7 @@
          "offImage": "img/act_off.png",
          "indicatorId": 1,
          "numIndicatorsInGroup": 2,
-         "handleName": "Parameter 111"
+         "handleName": "Parameter 115"
         }
        },
        "handle remapping": {
@@ -6946,7 +6955,7 @@
          "offImage": "img/act_off.png",
          "indicatorId": 1,
          "numIndicatorsInGroup": 2,
-         "handleName": "Parameter 112"
+         "handleName": "Parameter 116"
         }
        },
        "handle remapping": {
@@ -7003,7 +7012,7 @@
          "offImage": "img/act_off.png",
          "indicatorId": 1,
          "numIndicatorsInGroup": 2,
-         "handleName": "Parameter 113"
+         "handleName": "Parameter 117"
         }
        },
        "handle remapping": {
@@ -7032,9 +7041,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 114",
-         "rmsHandle": "Parameter 114",
-         "peakHoldHandle": "Parameter 114",
+         "peakHandle": "Parameter 118",
+         "rmsHandle": "Parameter 118",
+         "peakHoldHandle": "Parameter 118",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -7065,9 +7074,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 115",
-         "rmsHandle": "Parameter 115",
-         "peakHoldHandle": "Parameter 115",
+         "peakHandle": "Parameter 119",
+         "rmsHandle": "Parameter 119",
+         "peakHoldHandle": "Parameter 119",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -7098,9 +7107,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 116",
-         "rmsHandle": "Parameter 116",
-         "peakHoldHandle": "Parameter 116",
+         "peakHandle": "Parameter 120",
+         "rmsHandle": "Parameter 120",
+         "peakHoldHandle": "Parameter 120",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -7131,9 +7140,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 117",
-         "rmsHandle": "Parameter 117",
-         "peakHoldHandle": "Parameter 117",
+         "peakHandle": "Parameter 121",
+         "rmsHandle": "Parameter 121",
+         "peakHoldHandle": "Parameter 121",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -7164,9 +7173,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 118",
-         "rmsHandle": "Parameter 118",
-         "peakHoldHandle": "Parameter 118",
+         "peakHandle": "Parameter 122",
+         "rmsHandle": "Parameter 122",
+         "peakHoldHandle": "Parameter 122",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -7197,9 +7206,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 119",
-         "rmsHandle": "Parameter 119",
-         "peakHoldHandle": "Parameter 119",
+         "peakHandle": "Parameter 123",
+         "rmsHandle": "Parameter 123",
+         "peakHoldHandle": "Parameter 123",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -7230,9 +7239,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 120",
-         "rmsHandle": "Parameter 120",
-         "peakHoldHandle": "Parameter 120",
+         "peakHandle": "Parameter 124",
+         "rmsHandle": "Parameter 124",
+         "peakHoldHandle": "Parameter 124",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -7263,9 +7272,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 121",
-         "rmsHandle": "Parameter 121",
-         "peakHoldHandle": "Parameter 121",
+         "peakHandle": "Parameter 125",
+         "rmsHandle": "Parameter 125",
+         "peakHoldHandle": "Parameter 125",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -7296,9 +7305,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 122",
-         "rmsHandle": "Parameter 122",
-         "peakHoldHandle": "Parameter 122",
+         "peakHandle": "Parameter 126",
+         "rmsHandle": "Parameter 126",
+         "peakHoldHandle": "Parameter 126",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -7329,9 +7338,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 123",
-         "rmsHandle": "Parameter 123",
-         "peakHoldHandle": "Parameter 123",
+         "peakHandle": "Parameter 127",
+         "rmsHandle": "Parameter 127",
+         "peakHoldHandle": "Parameter 127",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -7362,9 +7371,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 124",
-         "rmsHandle": "Parameter 124",
-         "peakHoldHandle": "Parameter 124",
+         "peakHandle": "Parameter 128",
+         "rmsHandle": "Parameter 128",
+         "peakHoldHandle": "Parameter 128",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -7395,9 +7404,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 125",
-         "rmsHandle": "Parameter 125",
-         "peakHoldHandle": "Parameter 125",
+         "peakHandle": "Parameter 129",
+         "rmsHandle": "Parameter 129",
+         "peakHoldHandle": "Parameter 129",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -7428,9 +7437,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 126",
-         "rmsHandle": "Parameter 126",
-         "peakHoldHandle": "Parameter 126",
+         "peakHandle": "Parameter 130",
+         "rmsHandle": "Parameter 130",
+         "peakHoldHandle": "Parameter 130",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -7461,9 +7470,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 127",
-         "rmsHandle": "Parameter 127",
-         "peakHoldHandle": "Parameter 127",
+         "peakHandle": "Parameter 131",
+         "rmsHandle": "Parameter 131",
+         "peakHoldHandle": "Parameter 131",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -7494,9 +7503,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 128",
-         "rmsHandle": "Parameter 128",
-         "peakHoldHandle": "Parameter 128",
+         "peakHandle": "Parameter 132",
+         "rmsHandle": "Parameter 132",
+         "peakHoldHandle": "Parameter 132",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -7527,9 +7536,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 129",
-         "rmsHandle": "Parameter 129",
-         "peakHoldHandle": "Parameter 129",
+         "peakHandle": "Parameter 133",
+         "rmsHandle": "Parameter 133",
+         "peakHoldHandle": "Parameter 133",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -7560,9 +7569,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 130",
-         "rmsHandle": "Parameter 130",
-         "peakHoldHandle": "Parameter 130",
+         "peakHandle": "Parameter 134",
+         "rmsHandle": "Parameter 134",
+         "peakHoldHandle": "Parameter 134",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -7593,9 +7602,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 131",
-         "rmsHandle": "Parameter 131",
-         "peakHoldHandle": "Parameter 131",
+         "peakHandle": "Parameter 135",
+         "rmsHandle": "Parameter 135",
+         "peakHoldHandle": "Parameter 135",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -7626,9 +7635,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 132",
-         "rmsHandle": "Parameter 132",
-         "peakHoldHandle": "Parameter 132",
+         "peakHandle": "Parameter 136",
+         "rmsHandle": "Parameter 136",
+         "peakHoldHandle": "Parameter 136",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -7659,9 +7668,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 133",
-         "rmsHandle": "Parameter 133",
-         "peakHoldHandle": "Parameter 133",
+         "peakHandle": "Parameter 137",
+         "rmsHandle": "Parameter 137",
+         "peakHoldHandle": "Parameter 137",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -7692,9 +7701,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 134",
-         "rmsHandle": "Parameter 134",
-         "peakHoldHandle": "Parameter 134",
+         "peakHandle": "Parameter 138",
+         "rmsHandle": "Parameter 138",
+         "peakHoldHandle": "Parameter 138",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -7725,9 +7734,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 135",
-         "rmsHandle": "Parameter 135",
-         "peakHoldHandle": "Parameter 135",
+         "peakHandle": "Parameter 139",
+         "rmsHandle": "Parameter 139",
+         "peakHoldHandle": "Parameter 139",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -7758,9 +7767,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 136",
-         "rmsHandle": "Parameter 136",
-         "peakHoldHandle": "Parameter 136",
+         "peakHandle": "Parameter 140",
+         "rmsHandle": "Parameter 140",
+         "peakHoldHandle": "Parameter 140",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -7791,9 +7800,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 137",
-         "rmsHandle": "Parameter 137",
-         "peakHoldHandle": "Parameter 137",
+         "peakHandle": "Parameter 141",
+         "rmsHandle": "Parameter 141",
+         "peakHoldHandle": "Parameter 141",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -7824,9 +7833,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 138",
-         "rmsHandle": "Parameter 138",
-         "peakHoldHandle": "Parameter 138",
+         "peakHandle": "Parameter 142",
+         "rmsHandle": "Parameter 142",
+         "peakHoldHandle": "Parameter 142",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -7857,9 +7866,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 139",
-         "rmsHandle": "Parameter 139",
-         "peakHoldHandle": "Parameter 139",
+         "peakHandle": "Parameter 143",
+         "rmsHandle": "Parameter 143",
+         "peakHoldHandle": "Parameter 143",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -7890,9 +7899,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 140",
-         "rmsHandle": "Parameter 140",
-         "peakHoldHandle": "Parameter 140",
+         "peakHandle": "Parameter 144",
+         "rmsHandle": "Parameter 144",
+         "peakHoldHandle": "Parameter 144",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -7923,9 +7932,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 141",
-         "rmsHandle": "Parameter 141",
-         "peakHoldHandle": "Parameter 141",
+         "peakHandle": "Parameter 145",
+         "rmsHandle": "Parameter 145",
+         "peakHoldHandle": "Parameter 145",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -7956,9 +7965,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 142",
-         "rmsHandle": "Parameter 142",
-         "peakHoldHandle": "Parameter 142",
+         "peakHandle": "Parameter 146",
+         "rmsHandle": "Parameter 146",
+         "peakHoldHandle": "Parameter 146",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -7989,9 +7998,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 143",
-         "rmsHandle": "Parameter 143",
-         "peakHoldHandle": "Parameter 143",
+         "peakHandle": "Parameter 147",
+         "rmsHandle": "Parameter 147",
+         "peakHoldHandle": "Parameter 147",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -8022,9 +8031,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 144",
-         "rmsHandle": "Parameter 144",
-         "peakHoldHandle": "Parameter 144",
+         "peakHandle": "Parameter 148",
+         "rmsHandle": "Parameter 148",
+         "peakHoldHandle": "Parameter 148",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -8055,9 +8064,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 145",
-         "rmsHandle": "Parameter 145",
-         "peakHoldHandle": "Parameter 145",
+         "peakHandle": "Parameter 149",
+         "rmsHandle": "Parameter 149",
+         "peakHoldHandle": "Parameter 149",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -8088,9 +8097,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 146",
-         "rmsHandle": "Parameter 146",
-         "peakHoldHandle": "Parameter 146",
+         "peakHandle": "Parameter 150",
+         "rmsHandle": "Parameter 150",
+         "peakHoldHandle": "Parameter 150",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -8121,9 +8130,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 147",
-         "rmsHandle": "Parameter 147",
-         "peakHoldHandle": "Parameter 147",
+         "peakHandle": "Parameter 151",
+         "rmsHandle": "Parameter 151",
+         "peakHoldHandle": "Parameter 151",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -8154,9 +8163,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 148",
-         "rmsHandle": "Parameter 148",
-         "peakHoldHandle": "Parameter 148",
+         "peakHandle": "Parameter 152",
+         "rmsHandle": "Parameter 152",
+         "peakHoldHandle": "Parameter 152",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -8187,9 +8196,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 149",
-         "rmsHandle": "Parameter 149",
-         "peakHoldHandle": "Parameter 149",
+         "peakHandle": "Parameter 153",
+         "rmsHandle": "Parameter 153",
+         "peakHoldHandle": "Parameter 153",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -8220,9 +8229,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 150",
-         "rmsHandle": "Parameter 150",
-         "peakHoldHandle": "Parameter 150",
+         "peakHandle": "Parameter 154",
+         "rmsHandle": "Parameter 154",
+         "peakHoldHandle": "Parameter 154",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -8253,9 +8262,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 151",
-         "rmsHandle": "Parameter 151",
-         "peakHoldHandle": "Parameter 151",
+         "peakHandle": "Parameter 155",
+         "rmsHandle": "Parameter 155",
+         "peakHoldHandle": "Parameter 155",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -8286,9 +8295,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 152",
-         "rmsHandle": "Parameter 152",
-         "peakHoldHandle": "Parameter 152",
+         "peakHandle": "Parameter 156",
+         "rmsHandle": "Parameter 156",
+         "peakHoldHandle": "Parameter 156",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -8319,9 +8328,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 153",
-         "rmsHandle": "Parameter 153",
-         "peakHoldHandle": "Parameter 153",
+         "peakHandle": "Parameter 157",
+         "rmsHandle": "Parameter 157",
+         "peakHoldHandle": "Parameter 157",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -8352,9 +8361,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 154",
-         "rmsHandle": "Parameter 154",
-         "peakHoldHandle": "Parameter 154",
+         "peakHandle": "Parameter 158",
+         "rmsHandle": "Parameter 158",
+         "peakHoldHandle": "Parameter 158",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -8385,9 +8394,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 155",
-         "rmsHandle": "Parameter 155",
-         "peakHoldHandle": "Parameter 155",
+         "peakHandle": "Parameter 159",
+         "rmsHandle": "Parameter 159",
+         "peakHoldHandle": "Parameter 159",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -8418,9 +8427,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 156",
-         "rmsHandle": "Parameter 156",
-         "peakHoldHandle": "Parameter 156",
+         "peakHandle": "Parameter 160",
+         "rmsHandle": "Parameter 160",
+         "peakHoldHandle": "Parameter 160",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -8451,9 +8460,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 157",
-         "rmsHandle": "Parameter 157",
-         "peakHoldHandle": "Parameter 157",
+         "peakHandle": "Parameter 161",
+         "rmsHandle": "Parameter 161",
+         "peakHoldHandle": "Parameter 161",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -8484,9 +8493,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 158",
-         "rmsHandle": "Parameter 158",
-         "peakHoldHandle": "Parameter 158",
+         "peakHandle": "Parameter 162",
+         "rmsHandle": "Parameter 162",
+         "peakHoldHandle": "Parameter 162",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -8517,9 +8526,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 159",
-         "rmsHandle": "Parameter 159",
-         "peakHoldHandle": "Parameter 159",
+         "peakHandle": "Parameter 163",
+         "rmsHandle": "Parameter 163",
+         "peakHoldHandle": "Parameter 163",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -8550,9 +8559,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 160",
-         "rmsHandle": "Parameter 160",
-         "peakHoldHandle": "Parameter 160",
+         "peakHandle": "Parameter 164",
+         "rmsHandle": "Parameter 164",
+         "peakHoldHandle": "Parameter 164",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -8583,9 +8592,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 161",
-         "rmsHandle": "Parameter 161",
-         "peakHoldHandle": "Parameter 161",
+         "peakHandle": "Parameter 165",
+         "rmsHandle": "Parameter 165",
+         "peakHoldHandle": "Parameter 165",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -8616,9 +8625,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 162",
-         "rmsHandle": "Parameter 162",
-         "peakHoldHandle": "Parameter 162",
+         "peakHandle": "Parameter 166",
+         "rmsHandle": "Parameter 166",
+         "peakHoldHandle": "Parameter 166",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -8649,9 +8658,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 163",
-         "rmsHandle": "Parameter 163",
-         "peakHoldHandle": "Parameter 163",
+         "peakHandle": "Parameter 167",
+         "rmsHandle": "Parameter 167",
+         "peakHoldHandle": "Parameter 167",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -8682,9 +8691,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 164",
-         "rmsHandle": "Parameter 164",
-         "peakHoldHandle": "Parameter 164",
+         "peakHandle": "Parameter 168",
+         "rmsHandle": "Parameter 168",
+         "peakHoldHandle": "Parameter 168",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -8715,9 +8724,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 165",
-         "rmsHandle": "Parameter 165",
-         "peakHoldHandle": "Parameter 165",
+         "peakHandle": "Parameter 169",
+         "rmsHandle": "Parameter 169",
+         "peakHoldHandle": "Parameter 169",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -8748,9 +8757,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 166",
-         "rmsHandle": "Parameter 166",
-         "peakHoldHandle": "Parameter 166",
+         "peakHandle": "Parameter 170",
+         "rmsHandle": "Parameter 170",
+         "peakHoldHandle": "Parameter 170",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -8781,9 +8790,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 167",
-         "rmsHandle": "Parameter 167",
-         "peakHoldHandle": "Parameter 167",
+         "peakHandle": "Parameter 171",
+         "rmsHandle": "Parameter 171",
+         "peakHoldHandle": "Parameter 171",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -8814,9 +8823,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 168",
-         "rmsHandle": "Parameter 168",
-         "peakHoldHandle": "Parameter 168",
+         "peakHandle": "Parameter 172",
+         "rmsHandle": "Parameter 172",
+         "peakHoldHandle": "Parameter 172",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -8847,9 +8856,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 169",
-         "rmsHandle": "Parameter 169",
-         "peakHoldHandle": "Parameter 169",
+         "peakHandle": "Parameter 173",
+         "rmsHandle": "Parameter 173",
+         "peakHoldHandle": "Parameter 173",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -8880,9 +8889,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 170",
-         "rmsHandle": "Parameter 170",
-         "peakHoldHandle": "Parameter 170",
+         "peakHandle": "Parameter 174",
+         "rmsHandle": "Parameter 174",
+         "peakHoldHandle": "Parameter 174",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -8913,9 +8922,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 171",
-         "rmsHandle": "Parameter 171",
-         "peakHoldHandle": "Parameter 171",
+         "peakHandle": "Parameter 175",
+         "rmsHandle": "Parameter 175",
+         "peakHoldHandle": "Parameter 175",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -8946,9 +8955,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 172",
-         "rmsHandle": "Parameter 172",
-         "peakHoldHandle": "Parameter 172",
+         "peakHandle": "Parameter 176",
+         "rmsHandle": "Parameter 176",
+         "peakHoldHandle": "Parameter 176",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -8979,9 +8988,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 173",
-         "rmsHandle": "Parameter 173",
-         "peakHoldHandle": "Parameter 173",
+         "peakHandle": "Parameter 177",
+         "rmsHandle": "Parameter 177",
+         "peakHoldHandle": "Parameter 177",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -9012,9 +9021,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 174",
-         "rmsHandle": "Parameter 174",
-         "peakHoldHandle": "Parameter 174",
+         "peakHandle": "Parameter 178",
+         "rmsHandle": "Parameter 178",
+         "peakHoldHandle": "Parameter 178",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -9045,9 +9054,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 175",
-         "rmsHandle": "Parameter 175",
-         "peakHoldHandle": "Parameter 175",
+         "peakHandle": "Parameter 179",
+         "rmsHandle": "Parameter 179",
+         "peakHoldHandle": "Parameter 179",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -9078,9 +9087,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 176",
-         "rmsHandle": "Parameter 176",
-         "peakHoldHandle": "Parameter 176",
+         "peakHandle": "Parameter 180",
+         "rmsHandle": "Parameter 180",
+         "peakHoldHandle": "Parameter 180",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -9111,9 +9120,9 @@
          "inactiveImage": "img/bar_off.png",
          "peakImage": "img/bar_on.png",
          "rmsImage": "img/bar_on.png",
-         "peakHandle": "Parameter 177",
-         "rmsHandle": "Parameter 177",
-         "peakHoldHandle": "Parameter 177",
+         "peakHandle": "Parameter 181",
+         "rmsHandle": "Parameter 181",
+         "peakHoldHandle": "Parameter 181",
          "peakHoldSize": 1,
          "peakHoldColour": "ff000000"
         }
@@ -9236,6 +9245,35 @@
        "version": 2,
        "componentData": {
         "version": 1,
+        "name": "stress",
+        "type": "Button",
+        "data": {
+         "version": 2,
+         "onImage": "img/stress_on.png",
+         "offImage": "img/stress_off.png",
+         "buttonId": 1,
+         "numButtonsInGroup": 2,
+         "handleName": "Parameter 8",
+         "gestureBehaviour": "Toggle"
+        }
+       },
+       "handle remapping": {
+        "version": 1,
+        "map": []
+       },
+       "bounds": {
+        "version": 1,
+        "acceptsHWFocus": "No",
+        "showWhenDataModelInvalid": "Show",
+        "whenVisible": "Always",
+        "boundsType": "Absolute",
+        "bounds": "822 224 170 40"
+       }
+      },
+      {
+       "version": 2,
+       "componentData": {
+        "version": 1,
         "name": "ctrl2",
         "type": "slot_knob",
         "data": {
@@ -9258,7 +9296,7 @@
         "showWhenDataModelInvalid": "Hide",
         "whenVisible": "Always",
         "boundsType": "Absolute",
-        "bounds": "572 268 214 86"
+        "bounds": "572 268 146 86"
        }
       },
       {
@@ -9287,7 +9325,7 @@
         "showWhenDataModelInvalid": "Hide",
         "whenVisible": "Always",
         "boundsType": "Absolute",
-        "bounds": "572 358 214 86"
+        "bounds": "572 358 146 86"
        }
       },
       {
@@ -9316,7 +9354,152 @@
         "showWhenDataModelInvalid": "Hide",
         "whenVisible": "Always",
         "boundsType": "Absolute",
-        "bounds": "572 448 214 86"
+        "bounds": "572 448 146 86"
+       }
+      },
+      {
+       "version": 2,
+       "componentData": {
+        "version": 1,
+        "name": "ctrl1",
+        "type": "slot_menu",
+        "data": {
+         "version": 1,
+         "handleName": "Data"
+        }
+       },
+       "handle remapping": {
+        "version": 1,
+        "map": [
+         {
+          "key": "Data",
+          "value": "Parameter 1"
+         }
+        ]
+       },
+       "bounds": {
+        "version": 1,
+        "acceptsHWFocus": "Yes",
+        "showWhenDataModelInvalid": "Hide",
+        "whenVisible": "Always",
+        "boundsType": "Absolute",
+        "bounds": "572 538 146 86"
+       }
+      },
+      {
+       "version": 2,
+       "componentData": {
+        "version": 1,
+        "name": "ctrl12",
+        "type": "slot_menu",
+        "data": {
+         "version": 1,
+         "handleName": "Data"
+        }
+       },
+       "handle remapping": {
+        "version": 1,
+        "map": [
+         {
+          "key": "Data",
+          "value": "Parameter 12"
+         }
+        ]
+       },
+       "bounds": {
+        "version": 1,
+        "acceptsHWFocus": "Yes",
+        "showWhenDataModelInvalid": "Hide",
+        "whenVisible": "Always",
+        "boundsType": "Absolute",
+        "bounds": "724 268 146 86"
+       }
+      },
+      {
+       "version": 2,
+       "componentData": {
+        "version": 1,
+        "name": "ctrl13",
+        "type": "slot_knob",
+        "data": {
+         "version": 1,
+         "handleName": "Data"
+        }
+       },
+       "handle remapping": {
+        "version": 1,
+        "map": [
+         {
+          "key": "Data",
+          "value": "Parameter 13"
+         }
+        ]
+       },
+       "bounds": {
+        "version": 1,
+        "acceptsHWFocus": "Yes",
+        "showWhenDataModelInvalid": "Hide",
+        "whenVisible": "Always",
+        "boundsType": "Absolute",
+        "bounds": "724 358 146 86"
+       }
+      },
+      {
+       "version": 2,
+       "componentData": {
+        "version": 1,
+        "name": "ctrl14",
+        "type": "slot_knob",
+        "data": {
+         "version": 1,
+         "handleName": "Data"
+        }
+       },
+       "handle remapping": {
+        "version": 1,
+        "map": [
+         {
+          "key": "Data",
+          "value": "Parameter 14"
+         }
+        ]
+       },
+       "bounds": {
+        "version": 1,
+        "acceptsHWFocus": "Yes",
+        "showWhenDataModelInvalid": "Hide",
+        "whenVisible": "Always",
+        "boundsType": "Absolute",
+        "bounds": "724 448 146 86"
+       }
+      },
+      {
+       "version": 2,
+       "componentData": {
+        "version": 1,
+        "name": "ctrl15",
+        "type": "slot_knob",
+        "data": {
+         "version": 1,
+         "handleName": "Data"
+        }
+       },
+       "handle remapping": {
+        "version": 1,
+        "map": [
+         {
+          "key": "Data",
+          "value": "Parameter 15"
+         }
+        ]
+       },
+       "bounds": {
+        "version": 1,
+        "acceptsHWFocus": "Yes",
+        "showWhenDataModelInvalid": "Hide",
+        "whenVisible": "Always",
+        "boundsType": "Absolute",
+        "bounds": "724 538 146 86"
        }
       },
       {
@@ -9345,7 +9528,7 @@
         "showWhenDataModelInvalid": "Hide",
         "whenVisible": "Always",
         "boundsType": "Absolute",
-        "bounds": "572 538 214 86"
+        "bounds": "876 268 146 86"
        }
       },
       {
@@ -9374,7 +9557,7 @@
         "showWhenDataModelInvalid": "Hide",
         "whenVisible": "Always",
         "boundsType": "Absolute",
-        "bounds": "796 268 214 86"
+        "bounds": "876 358 146 86"
        }
       },
       {
@@ -9403,36 +9586,7 @@
         "showWhenDataModelInvalid": "Hide",
         "whenVisible": "Always",
         "boundsType": "Absolute",
-        "bounds": "796 358 214 86"
-       }
-      },
-      {
-       "version": 2,
-       "componentData": {
-        "version": 1,
-        "name": "ctrl8",
-        "type": "slot_menu",
-        "data": {
-         "version": 1,
-         "handleName": "Data"
-        }
-       },
-       "handle remapping": {
-        "version": 1,
-        "map": [
-         {
-          "key": "Data",
-          "value": "Parameter 8"
-         }
-        ]
-       },
-       "bounds": {
-        "version": 1,
-        "acceptsHWFocus": "Yes",
-        "showWhenDataModelInvalid": "Hide",
-        "whenVisible": "Always",
-        "boundsType": "Absolute",
-        "bounds": "796 448 214 86"
+        "bounds": "876 448 146 86"
        }
       },
       {
@@ -9461,7 +9615,7 @@
         "showWhenDataModelInvalid": "Hide",
         "whenVisible": "Always",
         "boundsType": "Absolute",
-        "bounds": "796 538 214 86"
+        "bounds": "876 538 146 86"
        }
       }
      ]

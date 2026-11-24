@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
-"""Writes plugin/Content/Samples/test_break.wav: a synthetic 2-bar break at 170 BPM.
+"""Writes the demo instruments to plugin/Content/Samples/ (all synthesised, no third-party audio):
 
-Generated from scratch (no third-party audio), mono, 16-bit, 44.1 kHz.
-Used by the Phase 0 proof of concept to draw the waveform overview.
+  inst01_break.wav  2-bar break at 170 BPM
+  inst02_sub.wav    sub bass, pitched at C-3
+  inst03_hat.wav    closed hat
+  inst04_stab.wav   minor chord stab, root C-3
+
+Mono, 16-bit, 44.1 kHz.
 """
 import math
 import os
@@ -71,17 +75,60 @@ def render():
     return [v / peak * 0.9 for v in out]
 
 
-def main():
-    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    path = os.path.join(root, "plugin", "Content", "Samples", "test_break.wav")
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    data = render()
+C3 = 130.8128
+
+
+def sub():
+    n = int(SR * 1.6)
+    return [math.sin(2 * math.pi * C3 * i / SR) * min(1.0, i / 200.0) * math.exp(-i / SR * 1.2) * 0.9 for i in range(n)]
+
+
+def hat():
+    rnd = random.Random(7)
+    n = int(SR * 0.09)
+    out, prev = [], 0.0
+    for i in range(n):
+        x = rnd.random() * 2 - 1
+        out.append((x - prev) * math.exp(-i / SR * 45) * 0.8)
+        prev = x
+    return out
+
+
+def stab():
+    n = int(SR * 0.7)
+    freqs = [C3 * 2, C3 * 2 * 2 ** (3 / 12), C3 * 2 * 2 ** (7 / 12)]
+    out = []
+    for i in range(n):
+        t = i / SR
+        s = 0.0
+        for f in freqs:
+            for h in range(1, 8):   # soft saw
+                s += math.sin(2 * math.pi * f * h * t) / h * (0.8 ** h)
+        out.append(s * math.exp(-t * 5) * min(1.0, i / 100.0))
+    peak = max(abs(v) for v in out)
+    return [v / peak * 0.8 for v in out]
+
+
+def write(path, data):
     with wave.open(path, "wb") as w:
         w.setnchannels(1)
         w.setsampwidth(2)
         w.setframerate(SR)
         w.writeframes(b"".join(struct.pack("<h", int(max(-1, min(1, v)) * 32767)) for v in data))
     print("wrote", path, len(data), "frames")
+
+
+def main():
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    folder = os.path.join(root, "plugin", "Content", "Samples")
+    os.makedirs(folder, exist_ok=True)
+    for old in os.listdir(folder):
+        if old.endswith(".wav"):
+            os.remove(os.path.join(folder, old))
+    write(os.path.join(folder, "inst01_break.wav"), render())
+    write(os.path.join(folder, "inst02_sub.wav"), sub())
+    write(os.path.join(folder, "inst03_hat.wav"), hat())
+    write(os.path.join(folder, "inst04_stab.wav"), stab())
     return 0
 
 

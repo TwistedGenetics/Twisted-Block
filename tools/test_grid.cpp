@@ -82,7 +82,8 @@ void check(bool ok, const char* what)
 
 // Indices (keep in step with the plugin).
 const int kLane = 1, kCursor = 2, kField = 3, kValue = 4, kFollow = 5, kLength = 7, kStress = 8, kTouch = 11;
-const int kRowBase = 12, kCols = 6, kRows = 16;
+const int kMode = 12, kInst = 13, kOctave = 14, kStep = 15;
+const int kRowBase = 16, kCols = 6, kRows = 16;
 const int kCursorSlot = kRowBase + kRows * kCols, kPlaySlot = kCursorSlot + 1;
 const int kFrames[6] = {129, 123, 257, 67, 38, 258};
 
@@ -130,7 +131,7 @@ int main(int argc, char** argv)
         setInt(kValue, 13, 255); block();
         check(cell(8, 4) == 13, "command cell edited to C");
         setInt(kField, 4, 4); block();
-        check(text(kValue) == "40", "command value shows 40");
+        check(text(kValue) == "3D", "command value shows 3D (slice offset)");
         setInt(kValue, 0x30, 255); block();
         check(cell(8, 5) == 0x30, "command value edited to 30");
 
@@ -138,6 +139,18 @@ int main(int argc, char** argv)
         setInt(kTouch, 10 * 5 + 1, 80); block();
         check(getInt(kCursor, 127) == 6 && getInt(kField, 4) == 1, "touching a cell moves cursor and field");
         check(getInt(kTouch, 80) == 80, "touch parameter returns to idle");
+
+        // Edit mode (default): a pad writes a note at the cursor and moves on by Step.
+        setInt(kLane, 1, 3); setInt(kCursor, 2, 127); setInt(kInst, 2 - 1, 3); setInt(kOctave, 2, 8); block();
+        block(128, {note(true, 36 + 7)});
+        block(128);
+        float audition = 0; for (int k = 0; k < 128; ++k) audition = std::fmax(audition, std::fabs(bufL[k]));
+        check(audition > 0.01f, "pad entry auditions the note");
+        block(128, {note(false, 36 + 7)});
+        check(getInt(kCursor, 127) == 3, "pad entry moved the cursor down one line");
+        setInt(kCursor, 2, 127); block();
+        check(cell(8, 1) == 2 + 24 + 7 && cell(8, 2) == 2, "pad entry wrote G-2 with instrument 02");
+        setInt(kLane, 0, 3);
 
         // Lane switch shows other lanes.
         setInt(kLane, 2, 3); block();
@@ -158,8 +171,12 @@ int main(int argc, char** argv)
     }
     else if (scenario == "play")
     {
-        // Hold a pad: plays from the top at 170 BPM, 4 LPB.
+        // Play mode. Hold a pad: plays from the top at 170 BPM, 4 LPB, and makes sound.
+        setInt(kMode, 0, 1); block();
         block(128, {note(true, 36)});
+        block(128);
+        float peak = 0; for (int k = 0; k < 128; ++k) peak = std::fmax(peak, std::fabs(bufL[k]));
+        check(peak > 0.01f, "pad in Play mode makes sound");
         int frames = (int)(44100.0 * 60.0 / 170.0 / 4.0 * 5.5);   // 5.5 lines
         while (frames > 0) { block(128); frames -= 128; }
         check(getInt(kPlaySlot, 16) == 8, "playhead on centre row while following");

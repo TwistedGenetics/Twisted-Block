@@ -27,8 +27,9 @@ FIELDS = 5
 LANES = 4
 WAVE_BARS = 64
 
-P_VOLUME, P_LANE, P_CURSOR, P_FIELD, P_VALUE, P_FOLLOW, P_LPB, P_LENGTH, P_STRESS, P_REDRAW, P_PCOUNT, P_TOUCH = range(12)
-P_ROW_BASE = 12
+(P_VOLUME, P_LANE, P_CURSOR, P_FIELD, P_VALUE, P_FOLLOW, P_LPB, P_LENGTH, P_STRESS, P_REDRAW, P_PCOUNT, P_TOUCH,
+ P_MODE, P_INST, P_OCTAVE, P_STEP) = range(16)
+P_ROW_BASE = 16
 P_CURSOR_SLOT = P_ROW_BASE + ROWS * COLS
 P_PLAY_SLOT = P_CURSOR_SLOT + 1
 P_ACT_BASE = P_PLAY_SLOT + 1
@@ -70,8 +71,13 @@ def strip_frames():
 EXPECTED_FRAMES = [129, 123, 257, 67, 38, 258]
 
 
+FONT_FILE = None
+
+
 class Gen:
     def __init__(self, out, font_path):
+        global FONT_FILE
+        FONT_FILE = font_path
         self.out = out
         self.img = os.path.join(out, "img")
         os.makedirs(self.img, exist_ok=True)
@@ -203,7 +209,7 @@ def ctrl_slot(overlay, w, h):
               rect(0, 0, w, h), when="WhenFocussed"),
         entry("name", "Label", {"version": 1, "textStyle": text_style(22, colour="ff333333"),
                                 "type": "Name", "handleName": "Data"}, rect(12, 4, w - 20, 28)),
-        entry("value", "Label", {"version": 1, "textStyle": text_style(40), "type": "Value", "handleName": "Data"},
+        entry("value", "Label", {"version": 1, "textStyle": text_style(34), "type": "Value", "handleName": "Data"},
               rect(12, 32, w - 20, h - 36)),
     ]
     return component(kids, actions)
@@ -323,14 +329,31 @@ def build(g):
     kids.append(entry("pcount", "Label", {"version": 1, "textStyle": text_style(30), "type": "Value", "handleName": p(P_PCOUNT)},
                       rect(PANEL_X + 110, 226, 120, 34)))
 
-    # --- edit controls, 2 columns x 4 rows
-    slots = [(P_CURSOR, "knob"), (P_FIELD, "menu"), (P_VALUE, "knob"), (P_LENGTH, "knob"),
-             (P_LPB, "knob"), (P_FOLLOW, "menu"), (P_STRESS, "menu"), (P_REDRAW, "menu")]
-    sw, sh = 214, 86
+    # stress test toggle
+    def stress_img(on):
+        w_, h_ = 170, 40
+        im = Image.new("RGBA", (w_, h_), (190, 190, 190, 255) if on else WHITE)
+        d = ImageDraw.Draw(im)
+        d.rectangle([0, 0, w_ - 1, h_ - 1], outline=BLACK if on else (140, 140, 140, 255), width=4 if on else 2)
+        f = ImageFont.truetype(FONT_FILE, 24)
+        t = "STRESS " + ("ON" if on else "OFF")
+        l, tt, r, b = d.textbbox((0, 0), t, font=f)
+        d.text(((w_ - (r - l)) / 2 - l, (h_ - (b - tt)) / 2 - tt), t, font=f, fill=BLACK)
+        return g.save(im, "stress_%s.png" % ("on" if on else "off"))
+    kids.append(entry("stress", "Button", {"version": 2, "onImage": stress_img(True), "offImage": stress_img(False),
+                                           "buttonId": 1, "numButtonsInGroup": 2, "handleName": p(P_STRESS),
+                                           "gestureBehaviour": "Toggle"},
+                      rect(PANEL_X + 250, 224, 170, 40)))
+
+    # --- edit controls, 3 columns x 4 rows (column = one Q-Link bank)
+    slots = [(P_CURSOR, "knob"), (P_FIELD, "menu"), (P_VALUE, "knob"), (P_LANE, "menu"),
+             (P_MODE, "menu"), (P_INST, "knob"), (P_OCTAVE, "knob"), (P_STEP, "knob"),
+             (P_LENGTH, "knob"), (P_LPB, "knob"), (P_FOLLOW, "menu"), (P_REDRAW, "menu")]
+    sw, sh = 146, 86
     for i, (param, kind) in enumerate(slots):
         col, row = divmod(i, 4)
         kids.append(entry("ctrl%d" % param, "slot_" + kind, {"version": 1, "handleName": "Data"},
-                          rect(PANEL_X + col * (sw + 10), 268 + row * (sh + 4), sw, sh),
+                          rect(PANEL_X + col * (sw + 6), 268 + row * (sh + 4), sw, sh),
                           remap=[{"key": "Data", "value": p(param)}], focus="Yes", show="Hide"))
 
     root = component(kids, background="ffffffff")
@@ -347,7 +370,8 @@ def build(g):
             {"key": p(P_FIELD), "value": ["Note", "Inst", "Vol", "Cmd", "Val"]},
             {"key": p(P_FOLLOW), "value": ["Off", "On"]},
             {"key": p(P_STRESS), "value": ["Off", "On"]},
-            {"key": p(P_REDRAW), "value": ["Poll", "Notify"]},
+            {"key": p(P_REDRAW), "value": ["Notify", "Rebuild", "Both", "Poll"]},
+            {"key": p(P_MODE), "value": ["Play", "Edit"]},
         ],
         "info": {"version": 1, "type": "CompleteDescription"},
         "tabs": [{"version": 1, "tabName": "GRID", "fnKeyIndex": 0, "fnKeySubIndex": 0,
@@ -360,8 +384,9 @@ def qlinks():
     m = {"Q-Link %d" % i: -1 for i in range(1, 17)}
     # Top row of knobs: the editing set. Next row: block settings.
     m.update({"Q-Link 13": P_CURSOR, "Q-Link 14": P_FIELD, "Q-Link 15": P_VALUE, "Q-Link 16": P_LANE,
-              "Q-Link 9": P_LENGTH, "Q-Link 10": P_LPB, "Q-Link 11": P_FOLLOW, "Q-Link 12": P_STRESS,
-              "Q-Link 5": P_REDRAW, "Q-Link 1": P_VOLUME})
+              "Q-Link 9": P_MODE, "Q-Link 10": P_INST, "Q-Link 11": P_OCTAVE, "Q-Link 12": P_STEP,
+              "Q-Link 5": P_LENGTH, "Q-Link 6": P_LPB, "Q-Link 7": P_FOLLOW, "Q-Link 8": P_REDRAW,
+              "Q-Link 1": P_VOLUME, "Q-Link 2": P_STRESS})
     return {"version": 4, "info": {"version": 1, "type": "CompleteDescription"},
             "Screen Mode Q-Links": {"version": 4, "map": [
                 {"Tab": 1, "SubTab": 1, "Bank Direction": "RowTopDown", "Q-Links": m}]},

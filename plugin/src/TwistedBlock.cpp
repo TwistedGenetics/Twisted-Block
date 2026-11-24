@@ -1,39 +1,39 @@
-// Twisted Block - Phase 0 proof of concept, by Twisted Genetics
+// Twisted Block - by Twisted Genetics
+// Phase 0b: tracker grid + a first sample engine and pad note entry.
 //
-// WHAT THIS IS
-//   A test of whether the MPC can show a live tracker grid. There is no audio
-//   engine yet: the plugin outputs silence. It only proves the screen.
+// THE SCREEN TRICK
+//   The MPC cannot draw from plugin code; its screen is built from JSON skins.
+//   Every grid cell is a FilmStrip image of glyphs ("C-3", "01", "0C"...)
+//   bound to a "display parameter" that this code writes. Scrolling means
+//   rewriting those parameters, then telling the MPC to redraw. How the MPC
+//   is told is the "Redraw" setting:
+//     Notify  - report each changed display parameter to the host (default)
+//     Rebuild - ask the MPC to rebuild the page (at most ~8 times a second)
+//     Both    - Notify and Rebuild
+//     Poll    - only write the value and hope the MPC re-reads it
 //
-// THE TRICK
-//   The MPC cannot draw from plugin code. Its screen is built from JSON skins.
-//   But a FilmStrip image shows the frame chosen by a parameter, and the MPC
-//   redraws it whenever that parameter changes. So every cell of the grid is a
-//   film strip of glyphs ("C-3", "01", "0C"...), bound to a read-only "display
-//   parameter" that this code writes. Scrolling = rewriting those parameters.
+// SCREEN
+//   One lane visible (16 rows: line, note, inst, vol, cmd, val), 4 lanes in
+//   the engine. The centre row is the current line (OctaMED style).
 //
-// SCREEN (one lane visible, 4 lanes in memory)
-//   16 rows x 6 columns: line number, note, instrument, volume, command, value.
-//   The centre row (row 8) is the current line, OctaMED style.
-//   Cursor row and playhead are Indicator lamps bound to one parameter each.
-//   Right side: lane buttons, lane activity, a 64-bar waveform (Meter widgets),
-//   and the edit controls.
+// MODES
+//   Edit: pads write a note at the cursor (and you hear it), cursor moves on
+//         by Step. Q-Links: Row / Field / Value / Lane.
+//   Play: holding a pad plays the block from the top. MPC Play also plays it,
+//         following the song position.
 //
-// EDITING
-//   Q-Link 13 = row, 14 = field, 15 = value, 16 = lane (top row of knobs).
-//   Touching a cell moves the cursor to it. Turning "Value" writes into the
-//   cell under the cursor.
-//
-// PLAYBACK
-//   - Hold a pad (any MIDI note): plays the block from the top, follows tempo.
-//   - MPC transport playing: the grid follows the song position.
-//   - "Stress" on: free-runs at the current tempo even when stopped, so every
-//     visible cell changes on every line (worst case for redraw speed).
+// ENGINE (first version)
+//   4 lanes, each one sample voice (plus a short fade-out of the previous
+//   note so there are no clicks). Instruments 01-04 are WAVs in
+//   Content/Samples. Note C-3 plays a sample at its own pitch. Volume column
+//   00-40. Command 9xx = sample offset (xx * 256 samples). OFF stops a lane.
 //
 // THREADS
-//   All grid logic runs on the audio thread in process(); it is the only
-//   writer of the block data and the display parameters. Nothing allocates.
+//   All grid and engine logic runs on the audio thread in process(). Samples
+//   load in the constructor. Nothing allocates in process().
 
 #include "mpc_plugin.h"
+#include "dsp/math.h"
 #include "dsp/wav.h"
 
 #include <cmath>
@@ -44,15 +44,15 @@ namespace {
 constexpr char kUid[5] = "TwBk";
 
 // ---- grid geometry (keep in step with tools/gen_skin.py) -------------------
-constexpr int kRows      = 16;   // visible rows
-constexpr int kCentreRow = 8;    // the "current line" bar
-constexpr int kCols      = 6;    // line, note, inst, vol, cmd, val
-constexpr int kFields    = 5;    // editable: note, inst, vol, cmd, val
+constexpr int kRows      = 16;
+constexpr int kCentreRow = 8;
+constexpr int kCols      = 6;
+constexpr int kFields    = 5;
 constexpr int kLanes     = 4;
 constexpr int kMaxLines  = 128;
 constexpr int kWaveBars  = 64;
+constexpr int kNumInsts  = 4;
 
-// Film strip frame counts. The last frame of each strip is blank.
 constexpr int kLineFrames = 129;  // 00..7F, blank
 constexpr int kNoteFrames = 123;  // ---, OFF, C-0..B-9, blank
 constexpr int kInstFrames = 257;  // --, 01..FF, blank
@@ -60,39 +60,29 @@ constexpr int kVolFrames  = 67;   // --, 00..40, blank
 constexpr int kCmdFrames  = 38;   // -, 0..9 A..Z, blank
 constexpr int kValFrames  = 258;  // 00..FF, --, blank
 
-// Highest stored value per field.
 constexpr int kFieldMax[kFields] = {121, 255, 65, 36, 255};
+constexpr int kNoteC3  = 2 + 36;   // stored value of C-3 (sample's own pitch)
+constexpr int kCmdOffs = 10;       // stored value of command '9'
 
 enum ParamIndex
 {
-    kVolume = 0,     // parameter 0 gets nudged by the host: keep it harmless
-    kLane,           // 1..4
-    kCursor,         // edit line
-    kField,          // Note / Inst / Vol / Cmd / Val
-    kValue,          // value of the cell under the cursor (edits it)
-    kFollow,         // grid follows the playhead
-    kLpb,            // lines per beat
-    kLength,         // block length in lines
-    kStress,         // free-run redraw stress test
-    kRedraw,         // Poll (just write) / Notify (also tell the host)
-    kParamCount,     // read-only: how many parameters the plugin has
-    kTouchCell,      // written by the touch buttons: row*5+field, 80 = idle
-    kRowBase,        // kRows * kCols display parameters start here
-    kCursorSlot = kRowBase + kRows * kCols,   // which visible row the cursor is on (16 = none)
-    kPlaySlot,                                // which visible row the playhead is on (16 = none)
-    kActBase,                                 // kLanes lane-activity lamps
-    kWaveBase = kActBase + kLanes,            // kWaveBars waveform bars
+    kVolume = 0,
+    kLane, kCursor, kField, kValue, kFollow, kLpb, kLength, kStress, kRedraw, kParamCount, kTouchCell,
+    kMode, kInst, kOctave, kStep,
+    kRowBase,
+    kCursorSlot = kRowBase + kRows * kCols,
+    kPlaySlot,
+    kActBase,
+    kWaveBase = kActBase + kLanes,
     kNumParams = kWaveBase + kWaveBars
 };
+
+enum RedrawMode { kNotify = 0, kRebuild, kBoth, kPoll };
 
 constexpr int kTouchIdle = kRows * kFields;
 
 struct Cell { uint8_t note = 0, inst = 0, vol = 0, cmd = 0, val = 0; };
-
-struct Block
-{
-    Cell cells[kLanes][kMaxLines];
-};
+struct Block { Cell cells[kLanes][kMaxLines]; };
 
 const char* const kNoteNames[12] = {"C-", "C#", "D-", "D#", "E-", "F-", "F#", "G-", "G#", "A-", "A#", "B-"};
 
@@ -105,12 +95,40 @@ std::string noteText(int v)
     std::snprintf(buf, sizeof(buf), "%s%d", kNoteNames[n % 12], n / 12);
     return buf;
 }
-
 std::string hex2(int v) { char b[8]; std::snprintf(b, sizeof(b), "%02X", v & 0xFF); return b; }
-
 char cmdChar(int v) { return v <= 0 ? '-' : (v <= 10 ? (char)('0' + v - 1) : (char)('A' + v - 11)); }
-
 int noteVal(int octave, int semi) { return 2 + octave * 12 + semi; }
+
+// One playing sample.
+struct Voice
+{
+    const std::vector<float>* data = nullptr;
+    double pos = 0.0, inc = 1.0;
+    float gain = 0.0f;
+    float ramp = 1.0f, rampStep = 0.0f;   // fade in / fade out
+    bool active = false;
+
+    float next()
+    {
+        if (!active) return 0.0f;
+        const size_t n = data->size();
+        size_t i = (size_t)pos;
+        if (i + 1 >= n) { active = false; return 0.0f; }
+        const float f = (float)(pos - (double)i);
+        float s = (*data)[i] + ((*data)[i + 1] - (*data)[i]) * f;
+        pos += inc;
+        ramp += rampStep;
+        if (ramp >= 1.0f) { ramp = 1.0f; rampStep = 0.0f; }
+        if (ramp <= 0.0f) { active = false; return 0.0f; }
+        return s * gain * ramp;
+    }
+};
+
+struct Lane
+{
+    Voice v[2];   // current note + previous note fading out
+    int cur = 0;
+};
 
 } // namespace
 
@@ -128,9 +146,13 @@ public:
         addParam(mpc::intParam   ("lpb",    "LPB",    1, 16, 4));
         addParam(mpc::intParam   ("length", "Length", 1, kMaxLines, 64));
         addParam(mpc::boolParam  ("stress", "Stress", false));
-        addParam(mpc::choiceParam("redraw", "Redraw", {"Poll", "Notify"}, 0));
-        addDisplay("pcount", "Params", kNumParams + 1, kNumParams);   // shows the count as its value
+        addParam(mpc::choiceParam("redraw", "Redraw", {"Notify", "Rebuild", "Both", "Poll"}, kNotify));
+        addDisplay("pcount", "Params", kNumParams + 1, kNumParams);
         addDisplay("touch",  "Touch",  kTouchIdle + 1, kTouchIdle);
+        addParam(mpc::choiceParam("mode",   "Mode",   {"Play", "Edit"}, 1));
+        addParam(mpc::intParam   ("inst",   "Inst",   1, kNumInsts, 1));
+        addParam(mpc::intParam   ("octave", "Octave", 0, 8, 3));
+        addParam(mpc::intParam   ("step",   "Step",   0, 16, 1));
 
         static const char* const colNames[kCols] = {"Line", "Note", "Inst", "Vol", "Cmd", "Val"};
         static const int colFrames[kCols] = {kLineFrames, kNoteFrames, kInstFrames, kVolFrames, kCmdFrames, kValFrames};
@@ -149,18 +171,18 @@ public:
             char id[16], name[16];
             std::snprintf(id, sizeof(id), "act%d", l);
             std::snprintf(name, sizeof(name), "Lane%d Act", l + 1);
-            mpc::Param p = mpc::boolParam(id, name, false); p.automatable = false; addParam(p);
+            addDisplay(id, name, 2, 0);
         }
         for (int b = 0; b < kWaveBars; ++b)
         {
             char id[16], name[16];
             std::snprintf(id, sizeof(id), "wave%02d", b);
             std::snprintf(name, sizeof(name), "Wave %02d", b);
-            mpc::Param p = mpc::floatParam(id, name, 0.0f, 1.0f, 0.0f); p.automatable = false; addParam(p);
+            addDisplay(id, name, 101, 0);   // 0..100 = bar height in percent
         }
 
+        loadInstruments();
         makeDemoBlock();
-        computeWaveBars();
     }
 
     void prepare(double sampleRate, int) override { sampleRate_ = sampleRate; }
@@ -168,145 +190,86 @@ public:
     void reset() override
     {
         if (pendingLoad_.exchange(false)) block_ = pendingBlock_;
-        waveDirty_ = true;
+        for (auto& l : lanes_) for (auto& v : l.v) v.active = false;
         last_ = EditKey{};
         lastValue_ = -1;
-        internalPlaying_ = false;
-        notesHeld_ = 0;
+        padPlaying_ = false;
+        padsHeld_ = 0;
+        lastLine_ = -1;
+        forceRedraw_ = true;
     }
 
     void process(mpc::ProcessContext& ctx) override
     {
-        if (pendingLoad_.exchange(false)) block_ = pendingBlock_;
-
-        // --- silence (no engine yet) ------------------------------------
-        for (int ch = 0; ch < ctx.numOutputs; ++ch)
-            std::memset(ctx.outputs[ch], 0, sizeof(float) * (size_t)ctx.numFrames);
+        if (pendingLoad_.exchange(false)) { block_ = pendingBlock_; forceRedraw_ = true; }
 
         const int length = mpc::clamp(getInt(kLength), 1, kMaxLines);
         const int lpb    = mpc::clamp(getInt(kLpb), 1, 16);
+        const bool editMode = getInt(kMode) == 1;
+        const bool stress = getBool(kStress);
         const double bpm = (ctx.transport.tempoValid && ctx.transport.bpm > 1.0) ? ctx.transport.bpm : 120.0;
         const double linesPerSample = bpm / 60.0 * lpb / sampleRate_;
+        const float master = mpc::dsp::dbToGain(get(kVolume));
 
-        // --- MIDI: hold a pad to play the block from the top --------------
-        for (int i = 0; i < ctx.numMidiEvents; ++i)
+        const bool hostPlaying = ctx.transport.playing && ctx.transport.ppqValid;
+        if (hostPlaying && !wasHostPlaying_) lastLine_ = -1;
+        wasHostPlaying_ = hostPlaying;
+        if (stress && !stressWasOn_) { stressPos_ = 0.0; lastLine_ = -1; }
+        stressWasOn_ = stress;
+
+        float* outL = ctx.outputs[0];
+        float* outR = ctx.numOutputs > 1 ? ctx.outputs[1] : nullptr;
+        int ev = 0;
+
+        for (int i = 0; i < ctx.numFrames; ++i)
         {
-            const mpc::MidiEvent& e = ctx.midi[i];
-            if (e.isNoteOn())
+            while (ev < ctx.numMidiEvents && ctx.midi[ev].sampleOffset <= i)
+                handleMidi(ctx.midi[ev++], editMode, length);
+
+            // Sequencer: which line are we on?
+            double pos = -1.0;
+            bool audible = true;
+            if (padPlaying_)       { pos = padPos_; padPos_ += linesPerSample; }
+            else if (hostPlaying)  { pos = ctx.transport.ppqPos * lpb + i * linesPerSample; }
+            else if (stress)       { pos = stressPos_; stressPos_ += linesPerSample; audible = false; }
+
+            if (pos >= 0.0)
             {
-                if (notesHeld_++ == 0) { internalPlaying_ = true; internalPos_ = 0.0; }
+                const long abs = (long)std::floor(pos);
+                const int line = (int)(abs % length);
+                if (abs != lastAbsLine_ || lastLine_ < 0)
+                {
+                    lastAbsLine_ = abs;
+                    lastLine_ = line;
+                    if (audible) triggerLine(line);
+                }
+                playLine_ = line;
             }
-            else if (e.isNoteOff())
+            else
             {
-                if (notesHeld_ > 0 && --notesHeld_ == 0) internalPlaying_ = false;
+                playLine_ = -1;
+                lastLine_ = -1;
             }
-            else if (e.isAllNotesOff()) { notesHeld_ = 0; internalPlaying_ = false; }
-        }
 
-        // --- where is the playhead? ---------------------------------------
-        int playLine = -1;
-        const bool stress = getBool(kStress);
-        if (internalPlaying_ || (stress && !ctx.transport.playing))
-        {
-            if (!internalPlaying_ && !stressRunning_) { internalPos_ = 0.0; }
-            stressRunning_ = !internalPlaying_;
-            playLine = (int)std::fmod(internalPos_, (double)length);
-            internalPos_ += linesPerSample * ctx.numFrames;
-            if (internalPos_ > 1.0e9) internalPos_ = 0.0;
+            float s = 0.0f;
+            for (auto& l : lanes_) s += l.v[0].next() + l.v[1].next();
+            s *= master;
+            outL[i] = s;
+            if (outR) outR[i] = s;
         }
-        else
-        {
-            stressRunning_ = false;
-            if (ctx.transport.playing && ctx.transport.ppqValid)
-            {
-                double line = std::floor(ctx.transport.ppqPos * lpb);
-                playLine = (int)std::fmod(std::fmax(0.0, line), (double)length);
-            }
-        }
+        while (ev < ctx.numMidiEvents) handleMidi(ctx.midi[ev++], editMode, length);
+        for (int ch = 2; ch < ctx.numOutputs; ++ch)
+            std::memset(ctx.outputs[ch], 0, sizeof(float) * (size_t)ctx.numFrames);
+        if (stressPos_ > 1.0e9) stressPos_ = 0.0;
 
-        // --- editing --------------------------------------------------------
-        int lane   = mpc::clamp(getInt(kLane), 0, kLanes - 1);
-        int cursor = mpc::clamp(getInt(kCursor), 0, length - 1);
-        int field  = mpc::clamp(getInt(kField), 0, kFields - 1);
-        const bool follow = getBool(kFollow);
-        const int centreLine = (follow && playLine >= 0) ? playLine : cursor;
-        const int top = centreLine - kCentreRow;
-
-        // A touched cell moves the cursor (and picks the field).
-        int touch = getInt(kTouchCell);
-        if (touch >= 0 && touch < kTouchIdle)
-        {
-            int line = top + touch / kFields;
-            if (line >= 0 && line < length) { cursor = line; field = touch % kFields; }
-            set(kCursor, (float)cursor);
-            set(kField, (float)field);
-            set(kTouchCell, (float)kTouchIdle);
-        }
-        else if (getInt(kCursor) != cursor) set(kCursor, (float)cursor);   // length shrank
-
-        EditKey key{lane, cursor, field};
-        int value = getInt(kValue);
-        if (!(key == last_))
-        {
-            // Cursor moved: show the cell's value on the Value control.
-            last_ = key;
-            lastValue_ = cellValue(lane, cursor, field);
-            set(kValue, (float)lastValue_);
-        }
-        else if (value != lastValue_)
-        {
-            // Value turned: write it into the cell.
-            int v = mpc::clamp(value, 0, kFieldMax[field]);
-            setCellValue(lane, cursor, field, v);
-            lastValue_ = v;
-            if (v != value) set(kValue, (float)v);
-        }
-
-        // --- draw ------------------------------------------------------------
-        const bool notify = getInt(kRedraw) == 1;
-        const int drawTop = (follow && playLine >= 0) ? playLine - kCentreRow : cursor - kCentreRow;
-        for (int r = 0; r < kRows; ++r)
-        {
-            const int line = drawTop + r;
-            const int base = kRowBase + r * kCols;
-            if (line < 0 || line >= length)
-            {
-                show(base + 0, kLineFrames - 1, notify);
-                show(base + 1, kNoteFrames - 1, notify);
-                show(base + 2, kInstFrames - 1, notify);
-                show(base + 3, kVolFrames - 1, notify);
-                show(base + 4, kCmdFrames - 1, notify);
-                show(base + 5, kValFrames - 1, notify);
-                continue;
-            }
-            const Cell& c = block_.cells[lane][line];
-            show(base + 0, line, notify);
-            show(base + 1, c.note, notify);
-            show(base + 2, c.inst, notify);
-            show(base + 3, c.vol, notify);
-            show(base + 4, c.cmd, notify);
-            show(base + 5, (c.cmd == 0 && c.val == 0) ? 256 : c.val, notify);
-        }
-        const int cslot = cursor - drawTop;
-        show(kCursorSlot, (cslot >= 0 && cslot < kRows) ? cslot : kRows, notify);
-        const int pslot = playLine - drawTop;
-        show(kPlaySlot, (playLine >= 0 && pslot >= 0 && pslot < kRows) ? pslot : kRows, notify);
-
-        const int actLine = playLine >= 0 ? playLine : cursor;
-        for (int l = 0; l < kLanes; ++l)
-            show(kActBase + l, block_.cells[l][actLine].note >= 2 ? 1 : 0, notify);
-
-        for (int b = 0; b < kWaveBars; ++b)
-            if (waveDirty_ || std::fabs(get(kWaveBase + b) - waveBars_[b]) > 1e-4f) set(kWaveBase + b, waveBars_[b]);
-        waveDirty_ = false;
-        if (getInt(kParamCount) != kNumParams) set(kParamCount, (float)kNumParams);
+        updateEditor(length);
+        draw(length, ctx.numFrames);
     }
 
-    // Value text for the edit controls (tracker style).
     bool formatValue(int index, float plain, std::string& out) override
     {
         const int v = (int)std::lround(plain);
-        if (index == kCursor) { out = hex2(v); return true; }
+        if (index == kCursor || index == kInst) { out = hex2(v); return true; }
         if (index == kValue)
         {
             switch (mpc::clamp(getInt(kField), 0, kFields - 1))
@@ -321,7 +284,6 @@ public:
         return false;
     }
 
-    // Block data is saved with the MPC project.
     void saveExtraState(std::vector<uint8_t>& out) override
     {
         const uint8_t header[4] = {'T', 'B', 'K', 1};
@@ -350,31 +312,205 @@ private:
         info.name         = "Twisted Block";
         info.vendor       = "Twisted Genetics";
         info.uniqueId     = MPC_FOURCC(kUid[0], kUid[1], kUid[2], kUid[3]);
-        info.version      = 1000;
+        info.version      = 1001;
         info.isInstrument = true;
         info.numInputs    = 0;
         info.numOutputs   = 2;
-        info.tailSamples  = 1;
+        info.tailSamples  = 4410;
         return info;
     }
 
-    // A read-only integer parameter 0..frames-1 that drives a film strip.
+    // Display parameters are left automatable so the MPC accepts change reports for them.
     void addDisplay(const char* id, const char* name, int frames, int def)
     {
-        mpc::Param p = mpc::intParam(id, name, 0, frames - 1, def);
-        p.automatable = false;
-        addParam(p);
+        addParam(mpc::intParam(id, name, 0, frames - 1, def));
     }
 
-    // Write a display parameter only when it differs from what the host sees.
-    // (Compared with the live value, not a cache, so a host that writes a
-    // display parameter, e.g. a preset or project load, is corrected next block.)
-    void show(int index, int v, bool notify)
+    // ---- MIDI --------------------------------------------------------------
+    void handleMidi(const mpc::MidiEvent& e, bool editMode, int length)
     {
-        if (getInt(index) == v) return;
-        set(index, (float)v);
-        if (notify) notifyHostParameterChanged(index);
+        if (e.isNoteOn())
+        {
+            if (editMode)
+            {
+                // Write the note at the cursor and audition it.
+                const int lane = mpc::clamp(getInt(kLane), 0, kLanes - 1);
+                const int line = mpc::clamp(getInt(kCursor), 0, length - 1);
+                const int inst = mpc::clamp(getInt(kInst), 1, kNumInsts);
+                const int note = mpc::clamp(2 + (e.note() - 36) + getInt(kOctave) * 12, 2, 121);
+                Cell& c = block_.cells[lane][line];
+                c.note = (uint8_t)note;
+                c.inst = (uint8_t)inst;
+                startNote(lane, note, inst, 0, 0, 0);
+                const int step = getInt(kStep);
+                if (step > 0) set(kCursor, (float)((line + step) % length));
+                last_ = EditKey{};   // re-sync the Value control
+                forceRedraw_ = true;
+            }
+            else if (padsHeld_++ == 0)
+            {
+                padPlaying_ = true;
+                padPos_ = 0.0;
+                lastLine_ = -1;
+            }
+        }
+        else if (e.isNoteOff())
+        {
+            if (editMode)
+                stopLane(mpc::clamp(getInt(kLane), 0, kLanes - 1));
+            else if (padsHeld_ > 0 && --padsHeld_ == 0)
+            {
+                padPlaying_ = false;
+                for (int l = 0; l < kLanes; ++l) stopLane(l);
+            }
+        }
+        else if (e.isAllNotesOff())
+        {
+            padsHeld_ = 0;
+            padPlaying_ = false;
+            for (int l = 0; l < kLanes; ++l) stopLane(l);
+        }
     }
+
+    // ---- engine -------------------------------------------------------------
+    void triggerLine(int line)
+    {
+        for (int l = 0; l < kLanes; ++l)
+        {
+            const Cell& c = block_.cells[l][line];
+            if (c.note == 1) { stopLane(l); continue; }
+            if (c.note >= 2) startNote(l, c.note, c.inst, c.vol, c.cmd, c.val);
+        }
+    }
+
+    void startNote(int lane, int note, int inst, int vol, int cmd, int val)
+    {
+        if (inst < 1 || inst > kNumInsts || samples_[inst - 1].empty()) return;
+        Lane& L = lanes_[lane];
+        Voice& old = L.v[L.cur];
+        if (old.active) old.rampStep = -1.0f / (0.004f * (float)sampleRate_);
+        L.cur ^= 1;
+        Voice& v = L.v[L.cur];
+        v.data = &samples_[inst - 1];
+        v.inc = std::pow(2.0, (note - kNoteC3) / 12.0) * sampleRates_[inst - 1] / sampleRate_;
+        v.pos = (cmd == kCmdOffs) ? (double)val * 256.0 : 0.0;
+        v.gain = (vol == 0 ? 1.0f : (float)(vol - 1) / 64.0f) * 0.4f;
+        v.ramp = 0.0f;
+        v.rampStep = 1.0f / (0.001f * (float)sampleRate_);
+        v.active = v.pos + 1.0 < (double)v.data->size();
+    }
+
+    void stopLane(int lane)
+    {
+        for (auto& v : lanes_[lane].v)
+            if (v.active) v.rampStep = -1.0f / (0.004f * (float)sampleRate_);
+    }
+
+    // ---- editing --------------------------------------------------------------
+    void updateEditor(int length)
+    {
+        const int mode = mpc::clamp(getInt(kRedraw), 0, 3);
+        notifyOn_ = (mode == kNotify || mode == kBoth);
+
+        int lane   = mpc::clamp(getInt(kLane), 0, kLanes - 1);
+        int cursor = mpc::clamp(getInt(kCursor), 0, length - 1);
+        int field  = mpc::clamp(getInt(kField), 0, kFields - 1);
+        const bool follow = getBool(kFollow);
+        const int top = ((follow && playLine_ >= 0) ? playLine_ : cursor) - kCentreRow;
+
+        const int touch = getInt(kTouchCell);
+        if (touch >= 0 && touch < kTouchIdle)
+        {
+            const int line = top + touch / kFields;
+            if (line >= 0 && line < length) { cursor = line; field = touch % kFields; }
+            set(kCursor, (float)cursor);
+            set(kField, (float)field);
+            set(kTouchCell, (float)kTouchIdle);
+            notify(kTouchCell);
+        }
+        else if (getInt(kCursor) != cursor) set(kCursor, (float)cursor);
+
+        EditKey key{lane, cursor, field};
+        const int value = getInt(kValue);
+        if (!(key == last_))
+        {
+            last_ = key;
+            lastValue_ = cellValue(lane, cursor, field);
+            set(kValue, (float)lastValue_);
+            notify(kCursor); notify(kField); notify(kValue);
+            forceRedraw_ = true;
+        }
+        else if (value != lastValue_)
+        {
+            const int v = mpc::clamp(value, 0, kFieldMax[field]);
+            setCellValue(lane, cursor, field, v);
+            lastValue_ = v;
+            if (v != value) { set(kValue, (float)v); notify(kValue); }
+            forceRedraw_ = true;
+        }
+    }
+
+    // ---- drawing --------------------------------------------------------------
+    void draw(int length, int frames)
+    {
+        const int mode = mpc::clamp(getInt(kRedraw), 0, 3);
+        changed_ = false;
+
+        const int lane   = mpc::clamp(getInt(kLane), 0, kLanes - 1);
+        const int cursor = mpc::clamp(getInt(kCursor), 0, length - 1);
+        const bool follow = getBool(kFollow);
+        const int top = ((follow && playLine_ >= 0) ? playLine_ : cursor) - kCentreRow;
+
+        for (int r = 0; r < kRows; ++r)
+        {
+            const int line = top + r;
+            const int base = kRowBase + r * kCols;
+            if (line < 0 || line >= length)
+            {
+                show(base + 0, kLineFrames - 1); show(base + 1, kNoteFrames - 1); show(base + 2, kInstFrames - 1);
+                show(base + 3, kVolFrames - 1);  show(base + 4, kCmdFrames - 1);  show(base + 5, kValFrames - 1);
+                continue;
+            }
+            const Cell& c = block_.cells[lane][line];
+            show(base + 0, line);
+            show(base + 1, c.note);
+            show(base + 2, c.inst);
+            show(base + 3, c.vol);
+            show(base + 4, c.cmd);
+            show(base + 5, (c.cmd == 0 && c.val == 0) ? 256 : c.val);
+        }
+        const int cslot = cursor - top;
+        show(kCursorSlot, (cslot >= 0 && cslot < kRows) ? cslot : kRows);
+        const int pslot = playLine_ - top;
+        show(kPlaySlot, (playLine_ >= 0 && pslot >= 0 && pslot < kRows) ? pslot : kRows);
+        const int actLine = playLine_ >= 0 ? playLine_ : cursor;
+        for (int l = 0; l < kLanes; ++l)
+            show(kActBase + l, block_.cells[l][actLine].note >= 2 ? 1 : 0);
+        for (int b = 0; b < kWaveBars; ++b)
+            show(kWaveBase + b, waveBars_[b]);
+        show(kParamCount, kNumParams);
+
+        // Rebuild mode: ask the MPC to rebuild the page, at most ~8 times a second.
+        rebuildTimer_ += frames;
+        if ((mode == kRebuild || mode == kBoth) && changed_ && rebuildTimer_ >= (int)(sampleRate_ / 8.0))
+        {
+            rebuildTimer_ = 0;
+            requestDisplayUpdate();
+        }
+        forceRedraw_ = false;
+    }
+
+    // Write a display parameter. Report it when it changed (or on a forced redraw).
+    void show(int index, int v)
+    {
+        const bool differs = getInt(index) != v;
+        if (!differs && !forceRedraw_) return;
+        if (differs) set(index, (float)v);
+        changed_ = true;
+        notify(index);
+    }
+
+    void notify(int index) { if (notifyOn_) notifyHostParameterChanged(index); }
 
     int cellValue(int lane, int line, int field) const
     {
@@ -389,7 +525,36 @@ private:
                          case 2: c.vol = (uint8_t)v; break; case 3: c.cmd = (uint8_t)v; break; default: c.val = (uint8_t)v; break; }
     }
 
-    // Test data so every lane has something to show.
+    // ---- content ----------------------------------------------------------------
+    void loadInstruments()
+    {
+        static const char* const files[kNumInsts] = {"Samples/inst01_break.wav", "Samples/inst02_sub.wav",
+                                                      "Samples/inst03_hat.wav", "Samples/inst04_stab.wav"};
+        for (int i = 0; i < kNumInsts; ++i)
+        {
+            dsp::WavData w;
+            if (dsp::loadWav(mpc::contentPath(files[i]), w) && w.numFrames() > 1)
+            {
+                samples_[i].assign(w.numFrames(), 0.0f);
+                for (int ch = 0; ch < w.numChannels(); ++ch)
+                    for (size_t f = 0; f < w.numFrames(); ++f)
+                        samples_[i][f] += w.channels[(size_t)ch][f] / (float)w.numChannels();
+                sampleRates_[i] = w.sampleRate;
+            }
+        }
+        const auto& s = samples_[0];
+        for (int b = 0; b < kWaveBars; ++b)
+        {
+            float peak = 0.0f;
+            if (!s.empty())
+            {
+                const size_t s0 = s.size() * (size_t)b / kWaveBars, s1 = s.size() * (size_t)(b + 1) / kWaveBars;
+                for (size_t i = s0; i < s1; ++i) peak = std::fmax(peak, std::fabs(s[i]));
+            }
+            waveBars_[b] = (int)std::lround(mpc::clamp(peak, 0.0f, 1.0f) * 100.0f);
+        }
+    }
+
     void makeDemoBlock()
     {
         auto put = [this](int lane, int line, int note, int inst, int vol = 0, int cmd = 0, int val = 0)
@@ -397,63 +562,45 @@ private:
             Cell& c = block_.cells[lane][line];
             c.note = (uint8_t)note; c.inst = (uint8_t)inst; c.vol = (uint8_t)vol; c.cmd = (uint8_t)cmd; c.val = (uint8_t)val;
         };
+        // The test break is 2 bars of 16ths at 170 BPM; slice(n) = offset of 16th step n in 9xx units.
+        auto slice = [](int step) { return (int)std::lround(step * (44100.0 * 60.0 / 170.0 / 4.0) / 256.0); };
         for (int bar = 0; bar < 4; ++bar)
         {
             const int o = bar * 16;
-            // Lane 1: break slices (9xx = sample offset).
-            put(0, o + 0,  noteVal(3, 0), 1, 0, 10, 0x00);
-            put(0, o + 4,  noteVal(3, 0), 1, 0, 10, 0x40);
-            put(0, o + 6,  noteVal(3, 0), 1, 0, 10, 0x20);
-            put(0, o + 10, noteVal(3, 0), 1, 0, 10, 0x00);
-            put(0, o + 12, noteVal(3, 0), 1, 0, 10, 0x40);
-            if (bar == 3) put(0, o + 14, noteVal(3, 0), 1, 0x31, 10, 0x60);
-            // Lane 2: sub bass.
-            put(1, o + 0, noteVal(1, bar == 2 ? 3 : 0), 2, 0x41);
-            put(1, o + 7, 1, 0);
-            put(1, o + 8, noteVal(1, bar == 2 ? 5 : 7), 2, 0x39, 4, 0x08);
-            // Lane 3: hats with volume.
-            for (int s = 2; s < 16; s += 4) put(2, o + s, noteVal(5, 6), 3, s == 14 ? 0x19 : 0x2D);
-            // Lane 4: chord stab every other bar.
-            if (bar % 2 == 0) put(3, o + 0, noteVal(4, 2), 4, 0x35, 22, 0x37);
+            put(0, o + 0,  kNoteC3, 1, 0, kCmdOffs, slice(0));
+            put(0, o + 4,  kNoteC3, 1, 0, kCmdOffs, slice(4));
+            put(0, o + 7,  kNoteC3, 1, 0, kCmdOffs, slice(7));
+            put(0, o + 10, kNoteC3, 1, 0, kCmdOffs, slice(10));
+            put(0, o + 12, kNoteC3, 1, 0, kCmdOffs, slice(bar == 3 ? 28 : 12));
+            if (bar == 3) put(0, o + 14, kNoteC3, 1, 0x31, kCmdOffs, slice(20));
+            put(1, o + 0, noteVal(3, bar == 2 ? 3 : 0), 2, 0x41);
+            put(1, o + 6, 1, 0);
+            put(1, o + 8, noteVal(3, bar == 2 ? 5 : 7), 2, 0x39);
+            put(1, o + 14, 1, 0);
+            for (int s = 2; s < 16; s += 4) put(2, o + s, kNoteC3, 3, s == 14 ? 0x19 : 0x2D);
+            if (bar % 2 == 0) put(3, o + 0, noteVal(3, 2), 4, 0x35);
         }
-    }
-
-    // 64-bar peak overview of the test WAV in Content/Samples.
-    void computeWaveBars()
-    {
-        dsp::WavData w;
-        const bool ok = dsp::loadWav(mpc::contentPath("Samples/test_break.wav"), w) && w.numFrames() > 0;
-        for (int b = 0; b < kWaveBars; ++b)
-        {
-            float peak = 0.0f;
-            if (ok)
-            {
-                const size_t n = w.numFrames();
-                const size_t s0 = n * (size_t)b / kWaveBars, s1 = n * (size_t)(b + 1) / kWaveBars;
-                for (size_t i = s0; i < s1; ++i)
-                    for (int ch = 0; ch < w.numChannels(); ++ch)
-                        peak = std::fmax(peak, std::fabs(w.channels[(size_t)ch][i]));
-            }
-            else
-            {
-                // Fallback shape: decaying hits on every 8th bar.
-                peak = std::exp(-0.45f * (float)(b % 8));
-            }
-            waveBars_[b] = mpc::clamp(peak, 0.0f, 1.0f);
-        }
-        waveDirty_ = true;
     }
 
     Block block_, pendingBlock_;
     std::atomic<bool> pendingLoad_{false};
-    float waveBars_[kWaveBars] = {};
-    bool waveDirty_ = true;
+    std::vector<float> samples_[kNumInsts];
+    double sampleRates_[kNumInsts] = {44100.0, 44100.0, 44100.0, 44100.0};
+    int waveBars_[kWaveBars] = {};
+    Lane lanes_[kLanes];
+
     EditKey last_;
     int lastValue_ = -1;
     double sampleRate_ = 44100.0;
-    bool internalPlaying_ = false, stressRunning_ = false;
-    int notesHeld_ = 0;
-    double internalPos_ = 0.0;
+
+    bool padPlaying_ = false, wasHostPlaying_ = false, stressWasOn_ = false;
+    int padsHeld_ = 0;
+    double padPos_ = 0.0, stressPos_ = 0.0;
+    long lastAbsLine_ = -1;
+    int lastLine_ = -1, playLine_ = -1;
+
+    bool notifyOn_ = true, changed_ = false, forceRedraw_ = true;
+    int rebuildTimer_ = 0;
 };
 
 MPC_PLUGIN_ENTRY(TwistedBlock)

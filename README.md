@@ -6,9 +6,26 @@ It works like Renoise Redux: blocks are triggered from keys in the MPC arranger
 (C1 = block 1, C#1 = block 2 ...), with 4 lanes per block. One lane is shown on
 screen at a time.
 
-**Status: Phase 0, proof of concept.** There is no audio engine yet; the plugin
-outputs silence. Phase 0 only answers one question: can the MPC show and scroll
-a live tracker grid fast enough?
+**Status: Phase 0b.** It has a tracker grid, a first sample engine with 4 demo
+instruments, and pad note entry. The main open question: can the MPC redraw the
+grid fast enough? See the "Redraw" setting below.
+
+## Quick start on the MPC
+
+- **Hear it:** set **Mode** to **Play** and hold a pad. The demo block plays
+  (break, sub, hats, stab) and the grid scrolls. MPC **Play** also plays it.
+- **Enter notes:** set **Mode** to **Edit**.
+  - Pick the lane (L1–L4), the **Inst** (01 break, 02 sub, 03 hat, 04 stab)
+    and the **Octave**.
+  - Press pads: each one writes a note at the cursor, plays it, and moves
+    down by **Step** lines.
+  - **Row** moves the cursor. **Field** + **Value** edit any column
+    (volume, command, value).
+- **If the grid doesn't change on screen:** change **Redraw**
+  (Notify → Rebuild → Both → Poll) and tell me which one works.
+
+Q-Link banks: 13–16 = Row / Field / Value / Lane; 9–12 = Mode / Inst / Octave / Step;
+5–8 = Length / LPB / Follow / Redraw; 1–2 = Volume / Stress.
 
 ## How the grid is drawn
 
