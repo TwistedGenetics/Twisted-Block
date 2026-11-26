@@ -1,20 +1,24 @@
-// test_grid.cpp - desktop test of the Phase 0 grid logic.
+// test_grid.cpp - desktop tests for Twisted Block.
 //
 // Loads the natively built plugin (.so/.dylib), drives it like the MPC would
-// (parameters, MIDI, transport) and checks the display parameters.
-// With --dump <file.json> it writes every parameter's normalised value, which
-// tools/preview_skin.py uses to draw a mock-up of the MPC screen.
+// (parameters, MIDI, transport) and checks display parameters and audio.
+// With --dump <file.json> it writes every parameter's normalised value and
+// text, which tools/preview_skin.py uses to draw a mock-up of the MPC screen.
+//
+// Scenarios: edit, play, quantise, effects, samples, stress
 //
 // Build:  c++ -std=c++17 -O2 -I<sdk>/framework -o test_grid tools/test_grid.cpp -ldl
 
 #include "mpc_vst2_abi.h"
 
 #include <dlfcn.h>
+#include <chrono>
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <string>
+#include <thread>
 #include <vector>
 
 namespace {
@@ -32,7 +36,10 @@ VstIntPtr host(AEffect*, VstInt32 opcode, VstInt32, VstIntPtr, void*, float)
         gTime.sampleRate = 44100.0;
         gTime.tempo = gBpm;
         gTime.ppqPos = gPpq;
-        gTime.flags = kVstTempoValid | kVstPpqPosValid | (gPlaying ? kVstTransportPlaying : 0);
+        gTime.barStartPos = std::floor(gPpq / 4.0) * 4.0;
+        gTime.timeSigNumerator = 4;
+        gTime.timeSigDenominator = 4;
+        gTime.flags = kVstTempoValid | kVstPpqPosValid | kVstBarsValid | kVstTimeSigValid | (gPlaying ? kVstTransportPlaying : 0);
         return (VstIntPtr)&gTime;
     }
     return 0;
@@ -41,20 +48,18 @@ VstIntPtr host(AEffect*, VstInt32 opcode, VstInt32, VstIntPtr, void*, float)
 AEffect* fx = nullptr;
 int failures = 0;
 float bufL[512], bufR[512];
+float lastPeak = 0.0f;
 
 VstIntPtr disp(VstInt32 op, VstInt32 idx = 0, VstIntPtr v = 0, void* p = nullptr, float o = 0)
 { return fx->dispatcher(fx, op, idx, v, p, o); }
 
-int numParams() { return fx->numParams; }
 float getN(int i) { return fx->getParameter(fx, i); }
 void setN(int i, float v) { fx->setParameter(fx, i, v); }
-
 std::string name(int i) { char b[256] = {0}; disp(effGetParamName, i, 0, b); return b; }
 std::string text(int i) { char b[256] = {0}; disp(effGetParamDisplay, i, 0, b); return b; }
 
-// Integer parameter helpers (the plugin's int params are min..max mapped to 0..1).
-void setInt(int i, int v, int maxv) { setN(i, maxv > 0 ? (float)v / (float)maxv : 0.0f); }
-int  getInt(int i, int maxv) { return (int)std::lround(getN(i) * maxv); }
+void setInt(int i, int v, int minv, int maxv) { setN(i, (float)(v - minv) / (float)(maxv - minv)); }
+int  getInt(int i, int minv, int maxv) { return minv + (int)std::lround(getN(i) * (maxv - minv)); }
 
 void block(int frames = 128, std::vector<VstMidiEvent> midi = {})
 {
@@ -64,7 +69,21 @@ void block(int frames = 128, std::vector<VstMidiEvent> midi = {})
     disp(effProcessEvents, 0, 0, &evs);
     float* outs[2] = {bufL, bufR};
     fx->processReplacing(fx, nullptr, outs, frames);
+    lastPeak = 0.0f;
+    for (int k = 0; k < frames; ++k)
+    {
+        if (!std::isfinite(bufL[k])) { lastPeak = 1e9f; break; }
+        lastPeak = std::fmax(lastPeak, std::fabs(bufL[k]));
+    }
     if (gPlaying) gPpq += frames / 44100.0 * gBpm / 60.0;
+}
+
+// Render n seconds; returns the loudest sample.
+float render(double seconds)
+{
+    float peak = 0.0f;
+    for (int k = 0; k < (int)(seconds * 44100.0 / 128.0); ++k) { block(); peak = std::fmax(peak, lastPeak); }
+    return peak;
 }
 
 VstMidiEvent note(bool on, int n)
@@ -74,26 +93,37 @@ VstMidiEvent note(bool on, int n)
     return e;
 }
 
-void check(bool ok, const char* what)
+void check(bool ok, const std::string& what)
 {
-    std::printf("%s  %s\n", ok ? "PASS" : "FAIL", what);
+    std::printf("%s  %s\n", ok ? "PASS" : "FAIL", what.c_str());
     if (!ok) ++failures;
 }
 
-// Indices (keep in step with the plugin).
-const int kLane = 1, kCursor = 2, kField = 3, kValue = 4, kFollow = 5, kLength = 7, kStress = 8, kTouch = 11;
-const int kMode = 12, kInst = 13, kOctave = 14, kStep = 15;
-const int kRowBase = 16, kCols = 6, kRows = 16;
-const int kCursorSlot = kRowBase + kRows * kCols, kPlaySlot = kCursorSlot + 1;
+void waitWorker() { for (int k = 0; k < 20; ++k) { std::this_thread::sleep_for(std::chrono::milliseconds(20)); block(); } }
+
+// ---- indices (keep in step with the plugin) -----------------------------------
+enum
+{
+    kVolume = 0, kLane, kCursor, kField, kValue, kFollow, kLpb, kLength, kStress, kRedraw, kParamCount, kTouch,
+    kMode, kInst, kOctave, kStep, kBlock, kBaseNote, kTrigger, kQuantise, kTicks,
+    kFile, kLoad, kRescan, kStart, kEnd, kLoop, kLoopStart, kGain, kReverse, kNormalise, kSliceMode, kSlices, kSense,
+    kSampleName, kPlaying, kRowBase
+};
+const int kRows = 16, kCols = 6;
+const int kCursorSlot = kRowBase + kRows * kCols, kPlaySlot = kCursorSlot + 1, kActBase = kPlaySlot + 1;
+const int kWaveBase = kActBase + 4, kStartSlot = kWaveBase + 64, kEndSlot = kStartSlot + 1, kLoopSlot = kEndSlot + 1;
+const int kSliceBase = kLoopSlot + 1;
 const int kFrames[6] = {129, 123, 257, 67, 38, 258};
 
-int cell(int row, int col) { return getInt(kRowBase + row * kCols + col, kFrames[col] - 1); }
+int cell(int row, int col) { return getInt(kRowBase + row * kCols + col, 0, kFrames[col] - 1); }
+int sliceMarks() { int n = 0; for (int b = 0; b < 64; ++b) n += getInt(kSliceBase + b, 0, 1); return n; }
+int waveSum() { int n = 0; for (int b = 0; b < 64; ++b) n += getInt(kWaveBase + b, 0, 100); return n; }
 
 } // namespace
 
 int main(int argc, char** argv)
 {
-    if (argc < 2) { std::fprintf(stderr, "usage: test_grid <plugin> [--dump file.json] [--scenario edit|play|lane3]\n"); return 2; }
+    if (argc < 2) { std::fprintf(stderr, "usage: test_grid <plugin> [--scenario name] [--dump file.json]\n"); return 2; }
     const char* dumpPath = nullptr;
     std::string scenario = "edit";
     for (int i = 2; i < argc; ++i)
@@ -111,91 +141,216 @@ int main(int argc, char** argv)
     disp(effMainsChanged, 0, 1);
     disp(effStartProcess);
 
-    std::printf("plugin reports %d parameters\n", numParams());
+    std::printf("plugin reports %d parameters (scenario: %s)\n", fx->numParams, scenario.c_str());
     block();
 
     if (scenario == "edit")
     {
-        // Cursor 0 sits on the centre row (8); the demo block has C-3 inst 01 there on lane 1.
-        check(getInt(kCursorSlot, 16) == 8, "cursor drawn on centre row");
-        check(cell(8, 0) == 0 && cell(8, 1) == 2 + 36 && cell(8, 2) == 1, "line 00: C-3 01 on lane 1");
+        check(getInt(kCursorSlot, 0, 16) == 8, "cursor drawn on centre row");
+        check(cell(8, 0) == 0 && cell(8, 1) == 2 + 36 && cell(8, 2) == 1, "block 01 line 00: C-3 01 on lane 1");
         check(cell(7, 1) == 122 && cell(0, 0) == 128, "rows above line 00 are blank");
-        check(text(kValue) == "C-3", "Value control shows the cell under the cursor (C-3)");
+        check(text(kValue) == "C-3", "Value shows the cell under the cursor (C-3)");
 
-        // Move the cursor to line 04 and the field to Cmd: value follows.
-        setInt(kCursor, 4, 127); setInt(kField, 3, 4); block();
-        check(cell(8, 0) == 4, "centre row now shows line 04");
-        check(text(kValue) == "9", "Value shows command 9 at line 04");
-
-        // Turn Value: edit the cell (cmd -> C = 1+12 = 13).
-        setInt(kValue, 13, 255); block();
-        check(cell(8, 4) == 13, "command cell edited to C");
-        setInt(kField, 4, 4); block();
+        setInt(kCursor, 4, 0, 127); setInt(kField, 3, 0, 4); block();
+        check(cell(8, 0) == 4 && text(kValue) == "9", "cursor to line 04, Value shows command 9");
+        setInt(kValue, 13, 0, 255); block();
+        check(cell(8, 4) == 13, "command edited to C");
+        setInt(kField, 4, 0, 4); block();
         check(text(kValue) == "3D", "command value shows 3D (slice offset)");
-        setInt(kValue, 0x30, 255); block();
+        setInt(kValue, 0x30, 0, 255); block();
         check(cell(8, 5) == 0x30, "command value edited to 30");
 
-        // Touch row 10 (= line 06), field Inst.
-        setInt(kTouch, 10 * 5 + 1, 80); block();
-        check(getInt(kCursor, 127) == 6 && getInt(kField, 4) == 1, "touching a cell moves cursor and field");
-        check(getInt(kTouch, 80) == 80, "touch parameter returns to idle");
+        setInt(kTouch, 10 * 5 + 1, 0, 80); block();
+        check(getInt(kCursor, 0, 127) == 6 && getInt(kField, 0, 4) == 1, "touching a cell moves cursor and field");
+        check(getInt(kTouch, 0, 80) == 80, "touch parameter returns to idle");
 
-        // Edit mode (default): a pad writes a note at the cursor and moves on by Step.
-        setInt(kLane, 1, 3); setInt(kCursor, 2, 127); setInt(kInst, 2 - 1, 3); setInt(kOctave, 2, 8); block();
+        // Pad entry (Edit mode is the default).
+        setInt(kLane, 1, 0, 3); setInt(kCursor, 2, 0, 127); setInt(kInst, 2, 1, 16); setInt(kOctave, 2, 0, 8); block();
         block(128, {note(true, 36 + 7)});
-        block(128);
-        float audition = 0; for (int k = 0; k < 128; ++k) audition = std::fmax(audition, std::fabs(bufL[k]));
-        check(audition > 0.01f, "pad entry auditions the note");
+        block();
+        check(lastPeak > 0.01f, "pad entry auditions the note");
         block(128, {note(false, 36 + 7)});
-        check(getInt(kCursor, 127) == 3, "pad entry moved the cursor down one line");
-        setInt(kCursor, 2, 127); block();
+        check(getInt(kCursor, 0, 127) == 3, "pad entry moved the cursor down one line");
+        setInt(kCursor, 2, 0, 127); block();
         check(cell(8, 1) == 2 + 24 + 7 && cell(8, 2) == 2, "pad entry wrote G-2 with instrument 02");
-        setInt(kLane, 0, 3);
+        setInt(kLane, 0, 0, 3);
 
-        // Lane switch shows other lanes.
-        setInt(kLane, 2, 3); block();
-        check(getN(kRowBase + 8 * kCols + 0) >= 0.0f, "lane 3 drawn");
-        setInt(kLane, 0, 3); setInt(kCursor, 0, 127); block();
+        // Blocks: switching shows another block and its length.
+        setInt(kBlock, 2, 1, 32); setInt(kCursor, 0, 0, 127); block(); block();
+        check(getInt(kLength, 1, 128) == 32, "block 02 has length 32");
+        check(cell(8, 1) == 2 + 36 && cell(8, 4) == 10, "block 02 line 00 shows its own data");
+        setInt(kLength, 48, 1, 128); block();
+        setInt(kBlock, 1, 1, 32); block(); block();
+        check(getInt(kLength, 1, 128) == 64, "block 01 keeps length 64");
+        setInt(kBlock, 2, 1, 32); block(); block();
+        check(getInt(kLength, 1, 128) == 48, "block 02 remembers its new length 48");
+        setInt(kBlock, 1, 1, 32); block(); block();
 
-        // Saved state restores the edit after a fresh load.
+        // Saved state restores edits after a reload.
         void* chunk = nullptr;
         VstIntPtr n = disp(effGetChunk, 0, 0, &chunk);
         std::vector<char> saved((char*)chunk, (char*)chunk + n);
-        setInt(kCursor, 4, 127); setInt(kField, 3, 4); block();
-        setInt(kValue, 0, 255); block();
+        setInt(kCursor, 4, 0, 127); setInt(kField, 3, 0, 4); block();
+        setInt(kValue, 0, 0, 255); block();
         check(cell(8, 4) == 0, "command cleared before reload");
         disp(effSetChunk, 0, (VstIntPtr)saved.size(), saved.data());
-        block(); setInt(kCursor, 4, 127); block(); block();
+        block(); setInt(kCursor, 4, 0, 127); block(); block();
         check(cell(8, 4) == 13, "block data restored from the saved chunk");
-        setInt(kCursor, 0, 127); setInt(kField, 0, 4); block();
+        setInt(kCursor, 0, 0, 127); setInt(kField, 0, 0, 4); block();
     }
     else if (scenario == "play")
     {
-        // Play mode. Hold a pad: plays from the top at 170 BPM, 4 LPB, and makes sound.
-        setInt(kMode, 0, 1); block();
+        setInt(kMode, 0, 0, 1); block();
+        // C1 (36) = block 01, gate.
         block(128, {note(true, 36)});
-        block(128);
-        float peak = 0; for (int k = 0; k < 128; ++k) peak = std::fmax(peak, std::fabs(bufL[k]));
-        check(peak > 0.01f, "pad in Play mode makes sound");
-        int frames = (int)(44100.0 * 60.0 / 170.0 / 4.0 * 5.5);   // 5.5 lines
-        while (frames > 0) { block(128); frames -= 128; }
-        check(getInt(kPlaySlot, 16) == 8, "playhead on centre row while following");
-        check(cell(8, 0) == 5, "grid scrolled to line 05");
+        check(render(0.05) > 0.01f, "C1 plays block 01 (sound)");
+        check(getInt(kPlaying, 0, 32) == 1, "Playing shows 01");
+        render(60.0 / 170.0 / 4.0 * 5.0);
+        check(getInt(kPlaySlot, 0, 16) == 8 && cell(8, 0) >= 5, "grid follows the playing line");
         block(128, {note(false, 36)});
-        check(getInt(kPlaySlot, 16) == 16, "playhead hidden after the pad is released");
-        // MPC transport: bar 2 beat 1 = ppq 4 -> line 16.
-        gPlaying = true; gPpq = 4.0; block(); block();
-        check(cell(8, 0) == 16, "transport ppq 4 -> line 10 (hex) on centre row");
-        // Keep the transport position for the preview dump.
+        check(getInt(kPlaying, 0, 32) == 0, "gate: note off stops the block");
+        // C#1 = block 02 (32 lines).
+        block(128, {note(true, 37)});
+        block();
+        check(getInt(kPlaying, 0, 32) == 2, "C#1 plays block 02");
+        check(cell(8, 4) == 10 || cell(8, 0) <= 1, "grid shows block 02");
+        block(128, {note(false, 37)});
+        // One-shot: D1 = block 03 (16 lines) stops by itself.
+        setInt(kTrigger, 1, 0, 1); block();
+        block(128, {note(true, 38)});
+        block(128, {note(false, 38)});
+        check(getInt(kPlaying, 0, 32) == 3, "one-shot keeps playing after note off");
+        render(60.0 / 170.0 / 4.0 * 17.0);
+        check(getInt(kPlaying, 0, 32) == 0, "one-shot stops at the end of the block");
+        setInt(kTrigger, 0, 0, 1);
+        // Notes outside the 32 blocks are ignored.
+        block(128, {note(true, 36 + 40)});
+        check(getInt(kPlaying, 0, 32) == 0, "note above block 32 ignored");
+        block(128, {note(false, 36 + 40)});
+        // Leave block 01 playing for the screen preview.
+        block(128, {note(true, 36)});
+        render(60.0 / 170.0 / 4.0 * 18.5);
+    }
+    else if (scenario == "quantise")
+    {
+        setInt(kMode, 0, 0, 1); setInt(kQuantise, 1, 0, 2); block();
+        gPlaying = true; gPpq = 0.3; block();
+        block(128, {note(true, 36)});
+        check(getInt(kPlaying, 0, 32) == 0, "quantise Beat: waits for the beat");
+        render(60.0 / 170.0 * 0.75);
+        check(getInt(kPlaying, 0, 32) == 1, "quantise Beat: starts on the next beat");
+        block(128, {note(false, 36)});
         gPlaying = false;
-        setInt(kStress, 0, 1);
-        gPlaying = true; gPpq = 4.0 + 2.0 / 4.0; block();   // line 18 (hex 12)
+    }
+    else if (scenario == "effects")
+    {
+        // Block 01 has 9xx offsets, R retrigger, 3xx porta and E chords; 02 has B reverse and 2xx slide.
+        setInt(kMode, 0, 0, 1); block();
+        block(128, {note(true, 36)});
+        float p1 = render(60.0 / 170.0 * 16.0);
+        block(128, {note(false, 36)});
+        check(p1 > 0.05f && p1 < 1.5f, "block 01 with commands renders (peak " + std::to_string(p1) + ")");
+        block(128, {note(true, 37)});
+        float p2 = render(60.0 / 170.0 * 8.0);
+        block(128, {note(false, 37)});
+        check(p2 > 0.05f && p2 < 1.5f, "block 02 (reverse, slide, chords) renders (peak " + std::to_string(p2) + ")");
+        // Every command on a lane, one line each, must not blow up.
+        setInt(kMode, 1, 0, 1); setInt(kBlock, 5, 1, 32); setInt(kLane, 0, 0, 3); setInt(kStep, 1, 0, 16); block(); block();
+        const char cmds[] = "0123459ABCDEFR";
+        for (int k = 0; cmds[k]; ++k)
+        {
+            setInt(kCursor, k, 0, 127); setInt(kField, 0, 0, 4); block();
+            setInt(kValue, 2 + 36, 0, 255); block();
+            setInt(kField, 1, 0, 4); block(); setInt(kValue, 2, 0, 255); block();
+            const int c = cmds[k] <= '9' ? 1 + (cmds[k] - '0') : 11 + (cmds[k] - 'A');
+            setInt(kField, 3, 0, 4); block(); setInt(kValue, c, 0, 255); block();
+            setInt(kField, 4, 0, 4); block(); setInt(kValue, 0x23, 0, 255); block();
+        }
+        setInt(kMode, 0, 0, 1); block();
+        block(128, {note(true, 36 + 4)});
+        float p3 = render(60.0 / 170.0 * 4.0);
+        block(128, {note(false, 36 + 4)});
+        check(p3 > 0.01f && p3 < 1.5f, "all commands 0-4 9 A-F R play cleanly (peak " + std::to_string(p3) + ")");
+    }
+    else if (scenario == "samples")
+    {
+        // Rescan finds the user folder next to VST2 Plugins.
+        setInt(kRescan, 1, 0, 1); waitWorker();
+        int userIdx = -1, total = 0;
+        bool demo = false;
+        std::string prev;
+        for (int i = 0; i < 256; ++i)
+        {
+            setInt(kFile, i, 0, 255);
+            const std::string t = text(kFile);
+            if (i > 0 && t == prev) break;   // past the end: the last name repeats
+            prev = t;
+            ++total;
+            if (t.find("user_loop") != std::string::npos) userIdx = i;
+            if (t.find("demo/inst04_stab") != std::string::npos) demo = true;
+        }
+        std::printf("INFO  %d files listed\n", total);
+        check(userIdx >= 0, "file list includes Twisted Block Samples/user_loop.wav");
+        check(demo, "file list includes the demo samples");
+
+        // Load it into instrument 05.
+        setInt(kInst, 5, 1, 16); block(); block();
+        check(text(kSampleName) == "(empty)", "instrument 05 starts empty");
+        setInt(kFile, userIdx, 0, 255); setInt(kLoad, 1, 0, 1); block(); waitWorker();
+        check(text(kSampleName) == "user_loop", "instrument 05 loaded: " + text(kSampleName));
+        check(waveSum() > 200, "waveform drawn for instrument 05");
+        check(getInt(kLoad, 0, 1) == 0, "Load button switches itself off");
+
+        // Start / end / loop markers.
+        setN(kStart, 0.25f); setN(kEnd, 0.75f); setInt(kLoop, 1, 0, 2); setN(kLoopStart, 0.5f); block(); block();
+        check(getInt(kStartSlot, 0, 64) == 16 && getInt(kEndSlot, 0, 64) == 47 && getInt(kLoopSlot, 0, 64) == 32,
+              "start/end/loop markers at 25/75/50 %");
+        setN(kStart, 0.0f); setN(kEnd, 1.0f); setInt(kLoop, 0, 0, 2); block(); block();
+        check(getInt(kLoopSlot, 0, 64) == 64, "loop marker hidden when loop is off");
+
+        // Slicing.
+        setInt(kSliceMode, 1, 0, 2); setInt(kSlices, 8, 2, 64); block(); block();
+        check(sliceMarks() == 8, "grid slicing: 8 markers");
+        setInt(kInst, 1, 1, 16); block(); block();
+        setInt(kSliceMode, 2, 0, 2); setN(kSense, 0.6f); block(); block();
+        const int tr = sliceMarks();
+        check(tr >= 6 && tr <= 40, "transient slicing on the break: " + std::to_string(tr) + " markers");
+        // Slice 3 plays on D#3 (C-3 + 3).
+        setInt(kMode, 1, 0, 1); setInt(kOctave, 3, 0, 8); setInt(kLane, 0, 0, 3); block();
+        block(128, {note(true, 36 + 3)}); block();
+        check(lastPeak > 0.001f, "a slice plays from its pad");
+        block(128, {note(false, 36 + 3)});
+        setInt(kSliceMode, 0, 0, 2); block();
+
+        // Normalise raises the gain of a quiet sample.
+        setInt(kInst, 5, 1, 16); block(); block();
+        const float g0 = getN(kGain);
+        setInt(kNormalise, 1, 0, 1); block(); block();
+        check(getN(kGain) > g0 && getInt(kNormalise, 0, 1) == 0, "Normalise raises the gain: " + text(kGain));
+
+        // Settings follow the instrument.
+        setInt(kInst, 1, 1, 16); block(); block();
+        check(getInt(kSliceMode, 0, 2) == 0 && text(kSampleName) == "inst01_break", "instrument 01 shows its own settings");
+        setInt(kInst, 5, 1, 16); block(); block();
+        check(getInt(kSliceMode, 0, 2) == 1 && getInt(kSlices, 2, 64) == 8, "instrument 05 keeps its slice settings");
+
+        // Project reload brings instrument 05 back from disk.
+        void* chunk = nullptr;
+        VstIntPtr n = disp(effGetChunk, 0, 0, &chunk);
+        std::vector<char> saved((char*)chunk, (char*)chunk + n);
+        setInt(kFile, 0, 0, 255);
+        for (int i = 0; i < 256; ++i) { setInt(kFile, i, 0, 255); if (text(kFile).find("demo/inst03_hat") != std::string::npos) break; }
+        setInt(kLoad, 1, 0, 1); block(); waitWorker();
+        check(text(kSampleName) == "inst03_hat", "instrument 05 replaced with the hat");
+        disp(effSetChunk, 0, (VstIntPtr)saved.size(), saved.data());
+        waitWorker();
+        check(text(kSampleName) == "user_loop" && getInt(kSliceMode, 0, 2) == 1, "project reload restores user_loop with its slices");
     }
     else if (scenario == "stress")
     {
-        setInt(kStress, 1, 1);
+        setInt(kStress, 1, 0, 1);
         int changes = 0, last = -1;
-        for (int b = 0; b < 344; ++b)   // 1 second
+        for (int b = 0; b < 344; ++b)
         {
             block(128);
             int v = cell(8, 0);
@@ -209,9 +364,13 @@ int main(int argc, char** argv)
     {
         FILE* f = std::fopen(dumpPath, "w");
         std::fprintf(f, "{\"params\": [");
-        for (int i = 0; i < numParams(); ++i)
+        for (int i = 0; i < fx->numParams; ++i)
+        {
+            std::string t = text(i);
+            for (auto& ch : t) if (ch == '"' || ch == '\\') ch = '\'';
             std::fprintf(f, "%s{\"index\": %d, \"name\": \"%s\", \"norm\": %.6f, \"text\": \"%s\"}", i ? ", " : "", i,
-                         name(i).c_str(), (double)getN(i), text(i).c_str());
+                         name(i).c_str(), (double)getN(i), t.c_str());
+        }
         std::fprintf(f, "]}\n");
         std::fclose(f);
         std::printf("dumped %s\n", dumpPath);

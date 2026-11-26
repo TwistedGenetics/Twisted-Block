@@ -41,18 +41,22 @@ jobs:
           SO="sdk/plugins/$PLUGIN_NAME/build/native/twisted-block.so"
           sdk/.sdk-tools/host_sim "$SO" test --notes 36,43
 
-      - name: Grid logic tests
+      - name: Plugin tests (grid, blocks, commands, samples)
         run: |
           SO="sdk/plugins/$PLUGIN_NAME/build/native/twisted-block.so"
-          c++ -std=c++17 -O2 -Isdk/framework -o test_grid tools/test_grid.cpp -ldl
-          for s in edit play stress; do ./test_grid "$SO" --scenario "$s" --dump "dump_$s.json"; done
+          python tools/make_test_wav.py --user "sdk/Twisted Block Samples"
+          c++ -std=c++17 -O2 -Isdk/framework -o test_grid tools/test_grid.cpp -ldl -lpthread
+          for s in edit play quantise effects samples stress; do ./test_grid "$SO" --scenario "$s" --dump "dump_$s.json"; done
 
       - name: Screen mock-ups
         run: |
           pip install pillow
           sudo apt-get install -y fonts-dejavu-core
           mkdir -p previews
-          for s in edit play stress; do python tools/preview_skin.py "dump_$s.json" "previews/$s.png"; done
+          python tools/preview_skin.py dump_edit.json previews/1-grid-edit.png 0
+          python tools/preview_skin.py dump_play.json previews/2-grid-playing.png 0
+          python tools/preview_skin.py dump_samples.json previews/3-setup.png 1
+          python tools/preview_skin.py dump_samples.json previews/4-sample.png 2
 
       - name: Package
         run: python sdk/tools/package.py "sdk/plugins/$PLUGIN_NAME" --out dist

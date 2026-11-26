@@ -118,8 +118,18 @@ def write(path, data):
     print("wrote", path, len(data), "frames")
 
 
+def user_loop():
+    """A quiet one-bar loop, used by the tests as a 'user' sample."""
+    data = render()[: int(SR * STEP * 16)]
+    return [v * 0.3 for v in data]
+
+
 def main():
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    if len(sys.argv) == 3 and sys.argv[1] == "--user":
+        os.makedirs(sys.argv[2], exist_ok=True)
+        write(os.path.join(sys.argv[2], "user_loop.wav"), user_loop())
+        return 0
     folder = os.path.join(root, "plugin", "Content", "Samples")
     os.makedirs(folder, exist_ok=True)
     for old in os.listdir(folder):

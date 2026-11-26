@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Draws a mock-up of the MPC screen from plugin/skins/TUI.json and a parameter dump.
 
-    python3 tools/preview_skin.py <dump.json> <out.png>
+    python3 tools/preview_skin.py <dump.json> <out.png> [tab number, 0 = first]
 
 The dump comes from tools/test_grid.cpp (--dump). This is an approximation for
 checking layout on a computer: the MPC uses its own fonts (Roboto here is
@@ -24,7 +24,7 @@ def load_tui():
         return json.load(f)["pageData"]
 
 
-def main(dump_path, out_path):
+def main(dump_path, out_path, tab_index=0):
     page = load_tui()
     params = {p["index"]: p for p in json.load(open(dump_path))["params"]}
     comps = {c["key"]: c["value"] for c in page["componentDefinitions"]["localComponentDefinitions"]}
@@ -58,7 +58,11 @@ def main(dump_path, out_path):
     d0.rectangle([0, 0, 1279, 109], fill=(225, 225, 225, 255))
     d0.text((20, 35), "MPC  |  Track 1  |  Twisted Block  (mock-up)", font=ImageFont.truetype(FONT, 30), fill=(0, 0, 0, 255))
     d0.rectangle([0, 738, 1279, 799], fill=(225, 225, 225, 255))
-    d0.text((40, 750), "GRID", font=ImageFont.truetype(FONT, 30), fill=(0, 0, 0, 255))
+    for i, t in enumerate(page["tabs"]):
+        f = ImageFont.truetype(FONT, 30)
+        if i == tab_index:
+            d0.rectangle([20 + i * 220, 742, 220 + i * 220, 796], outline=(0, 0, 0, 255), width=4)
+        d0.text((40 + i * 220, 750), t["tabName"], font=f, fill=(0, 0, 0, 255))
     tab = Image.new("RGBA", (1280, 628), (255, 255, 255, 255))
 
     def draw(component, ox, oy, remaps):
@@ -114,7 +118,7 @@ def main(dump_path, out_path):
                 tx = x if "left" in ts["justification"] else x + (w - (r - l)) / 2
                 d.text((tx - l, y + (h - (b - tt)) / 2 - tt), s, font=font, fill=rgba)
 
-    root = page["tabs"][0]["componentDefinition"]
+    root = page["tabs"][tab_index]["componentDefinition"]
     draw(root, 0, 0, [])
     screen.alpha_composite(tab, (0, 110))
     screen.convert("RGB").save(out_path)
@@ -122,7 +126,7 @@ def main(dump_path, out_path):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
+    if len(sys.argv) not in (3, 4):
         print(__doc__)
         sys.exit(2)
-    main(sys.argv[1], sys.argv[2])
+    main(sys.argv[1], sys.argv[2], int(sys.argv[3]) if len(sys.argv) == 4 else 0)
